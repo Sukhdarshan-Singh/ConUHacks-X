@@ -14,3 +14,18 @@ An Interactive Murder Mystery game.
 - Backend: Flask
 - AI / APIs: Gemini API
 - Database: MongoDB
+
+
+## Flask backend
+
+### Setup
+```bash
+cd backend
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Mac/Linux:
+# source venv/bin/activate
+
+pip install -r requirements.txt
+copy .env  # Windows PowerShell: Copy-Item .env.example .env
