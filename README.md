@@ -29,3 +29,6 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 copy .env  # Windows PowerShell: Copy-Item .env.example .env
+
+#run app
+python wsgi.py
