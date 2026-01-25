@@ -216,10 +216,52 @@ Truth: Fell for phishing email</p>
         fileName="Final_Information.dox" 
         password="004ysrm" 
         content={
-          <div>
-            <h2>Final Report</h2>
-            <p>You found the secret info!</p>
-          </div>
+            <div style={{ fontFamily: "serif", padding: "20px" }}>
+                <h2>FINAL REPORT</h2>
+                <hr />
+
+                <p style={{ color: "darkred", fontWeight: "bold" }}>
+                ⚠️ FICTIONAL DOCUMENT — FOR INTERNAL SIMULATION USE ONLY
+                </p>
+
+                <h3>Desjardins Group</h3>
+                <p><strong>Document Type:</strong> Simulated Transaction Record</p>
+                <p><strong>Generated:</strong> 2026-01-24 02:17 AM</p>
+
+                <hr />
+
+                <p><strong>Employee ID:</strong> 004</p>
+                <p><strong>Authorization Level:</strong> Internal Finance Clearance</p>
+
+                <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "15px" }}>
+                <thead>
+                    <tr>
+                    <th style={{ borderBottom: "1px solid #000", textAlign: "left" }}>Transaction Type</th>
+                    <th style={{ borderBottom: "1px solid #000", textAlign: "left" }}>Amount</th>
+                    <th style={{ borderBottom: "1px solid #000", textAlign: "left" }}>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>Wire Withdrawal</td>
+                    <td>$1,527,001.00 CAD</td>
+                    <td>Completed</td>
+                    </tr>
+                </tbody>
+                </table>
+
+                <p style={{ marginTop: "15px" }}>
+                <strong>Notes:</strong><br />
+                Transaction executed during off-hours. Authorization logs indicate use of elevated credentials.
+                Audit trail partially redacted.
+                </p>
+
+                <hr />
+
+                <p style={{ fontSize: "12px", opacity: 0.7 }}>
+                This document is part of a fictional narrative and does not represent real banking data.
+                </p>
+            </div>
         } />
         
       </div>
