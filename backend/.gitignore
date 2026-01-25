@@ -1,5 +1,14 @@
-venv/
+# Python
 __pycache__/
 *.pyc
+venv/
 .env
-instance/
+.env.local
+
+# Node / Vite
+node_modules/
+
+
+# OS
+.DS_Store
+Thumbs.db

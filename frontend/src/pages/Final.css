@@ -1,0 +1,111 @@
+.final {
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background-color: #3d2817;
+}
+
+.final-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.final-title {
+    font-size: 60px;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.suspect-text {
+    color: #c41e3a;
+    font-weight: 900;
+}
+
+.suspects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    width: 100%;
+    justify-items: center;
+    margin: 20px 0;
+}
+
+.select-btn {
+    background: #c41e3a;
+    color: white;
+    border: none;
+    padding: 16px 60px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    margin-top: 20px;
+}
+
+.select-btn:hover:not(:disabled) {
+    background: #a01830;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.select-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.select-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .final-title {
+        font-size: 40px;
+    }
+
+    .suspects-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .select-btn {
+        padding: 12px 40px;
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .final-title {
+        font-size: 28px;
+    }
+
+    .suspects-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .suspect-image {
+        width: 120px;
+        height: 160px;
+    }
+
+    .select-btn {
+        padding: 10px 30px;
+        font-size: 16px;
+    }
+}

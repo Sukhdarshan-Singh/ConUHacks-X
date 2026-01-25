@@ -153,6 +153,8 @@ const IconSend = () => (
 /* =========================
    Helpers
 ========================= */
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
 async function postChat(message) {
   const res = await fetch("/api/chat/kevin", {
     method: "POST",
@@ -202,6 +204,21 @@ export default function Chat() {
     { name: "Janet", role: "Accounting", status: "Do not disturb" },
   ];
 
+  // ----- Draggable window state -----
+  const [state, setState] = useState({
+    pos: { x: 0, y: 0 },
+    minimized: false,
+    maximized: false,
+  });
+
+  const drag = useRef({
+    dragging: false,
+    startMouseX: 0,
+    startMouseY: 0,
+    startX: 0,
+    startY: 0,
+  });
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -235,155 +252,214 @@ export default function Chat() {
     inputRef.current?.focus();
   };
 
+  // Global mouse listeners for dragging
+  useEffect(() => {
+    function onMove(e) {
+      if (!drag.current.dragging) return;
+      if (state.maximized || state.minimized) return;
+
+      const dx = e.clientX - drag.current.startMouseX;
+      const dy = e.clientY - drag.current.startMouseY;
+
+      const nextX = drag.current.startX + dx;
+      const nextY = drag.current.startY + dy;
+
+      setState((prev) => ({
+        ...prev,
+        pos: {
+          x: clamp(nextX, -900, 900),
+          y: clamp(nextY, -650, 650),
+        },
+      }));
+    }
+
+    function onUp() {
+      drag.current.dragging = false;
+    }
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [state.maximized, state.minimized]);
+
+  // This starts dragging (attached to header)
+  const onDragMouseDown = (e) => {
+    if (state.maximized || state.minimized) return;
+
+    drag.current.dragging = true;
+    drag.current.startMouseX = e.clientX;
+    drag.current.startMouseY = e.clientY;
+    drag.current.startX = state.pos.x;
+    drag.current.startY = state.pos.y;
+  };
+
   const onSubmit = (e) => {
     e.preventDefault();
     send();
   };
 
-  // Sidebar “icon background” styles (THIS is what you wanted)
-  const sideBtn =
-    "p-2 rounded-xl bg-white/15 text-white flex items-center justify-center";
-  const sideBtnActive =
-    "p-2 rounded-xl bg-white/30 text-white flex items-center justify-center";
+  // Sidebar “icon background” styles
+  const sideBtn = "p-2 rounded-xl bg-white/15 text-white flex items-center justify-center";
+  const sideBtnActive = "p-2 rounded-xl bg-white/30 text-white flex items-center justify-center";
 
   return (
-    <div className="fixed inset-0 flex overflow-hidden bg-[#f3f2f1]">
-      {/* Left app bar */}
-      <div className="w-16 bg-[#464775] flex flex-col items-center py-4 space-y-6">
-        <div className={sideBtn}>
-          <IconActivity />
+    // Background layer
+    <div className="fixed inset-0 bg-[#f3f2f1] overflow-hidden">
+      {/* Draggable layer */}
+      <div
+        className="absolute inset-0 flex overflow-hidden"
+        style={{
+          transform: `translate3d(${state.pos.x}px, ${state.pos.y}px, 0)`,
+          transition: drag.current.dragging ? "none" : "transform 120ms ease-out",
+        }}
+      >
+        {/* Left app bar */}
+        <div className="w-16 bg-[#464775] flex flex-col items-center py-4 space-y-6">
+          <div className={sideBtn}>
+            <IconActivity />
+          </div>
+
+          <div className={sideBtnActive}>
+            <IconChat />
+          </div>
+
+          <div className={sideBtn}>
+            <IconTeams />
+          </div>
+
+          <div className={sideBtn}>
+            <IconCalendar />
+          </div>
+
+          <div className={`mt-auto ${sideBtn}`}>
+            <IconSettings />
+          </div>
         </div>
 
-        <div className={sideBtnActive}>
-          <IconChat />
-        </div>
+        {/* Chat list */}
+        <div className="w-80 bg-[#edebe9] border-r border-black/10 flex flex-col">
+          <div className="p-4 flex items-center justify-between">
+            <div className="font-bold text-xl text-[#242424]">Chat</div>
+            <button className="p-2 rounded bg-black/5 text-black/90" title="New chat" type="button">
+              <IconNewChat />
+            </button>
+          </div>
 
-        <div className={sideBtn}>
-          <IconTeams />
-        </div>
+          <div className="px-4 pb-3">
+            <input className="w-full p-2 rounded border border-black/10 bg-white" placeholder="Search" />
+          </div>
 
-        <div className={sideBtn}>
-          <IconCalendar />
-        </div>
-
-        <div className={`mt-auto ${sideBtn}`}>
-          <IconSettings />
-        </div>
-      </div>
-
-      {/* Chat list */}
-      <div className="w-80 bg-[#edebe9] border-r border-black/10 flex flex-col">
-        <div className="p-4 flex items-center justify-between">
-          <div className="font-bold text-xl text-[#242424]">Chat</div>
-          <button className="p-2 rounded bg-black/5 text-black/90" title="New chat">
-            <IconNewChat />
-          </button>
-        </div>
-
-        <div className="px-4 pb-3">
-          <input
-            className="w-full p-2 rounded border border-black/10 bg-white"
-            placeholder="Search"
-          />
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
-          {contacts.map((c) => (
-            <div key={c.name} className="px-4 py-3 hover:bg-[#e1dfdd] cursor-pointer">
-              <div className="flex items-center justify-between">
-                <div className="font-semibold text-[#242424]">{c.name}</div>
-                <div className="text-xs text-black/50">{c.status}</div>
+          <div className="flex-1 overflow-y-auto">
+            {contacts.map((c) => (
+              <div key={c.name} className="px-4 py-3 hover:bg-[#e1dfdd] cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-[#242424]">{c.name}</div>
+                  <div className="text-xs text-black/50">{c.status}</div>
+                </div>
+                <div className="text-sm text-black/60">{c.role}</div>
               </div>
-              <div className="text-sm text-black/60">{c.role}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Chat window */}
+        <div className="flex-1 flex flex-col">
+          {/* Header (DRAG HANDLE) */}
+          <div
+            onMouseDown={onDragMouseDown}
+            className="h-14 bg-white border-b border-black/10 flex items-center justify-between px-4 select-none"
+            style={{ cursor: "grab" }}
+            title="Drag to move"
+          >
+            <div>
+              <div className="font-semibold text-[#242424]">Kevin (IT)</div>
+              <div className="text-xs text-black/50">Terminal-style support</div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Chat window */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="h-14 bg-white border-b border-black/10 flex items-center justify-between px-4">
-          <div>
-            <div className="font-semibold text-[#242424]">Kevin (IT)</div>
-            <div className="text-xs text-black/50">Terminal-style support</div>
+            {/* Prevent drag when clicking buttons */}
+            <div
+              className="flex items-center gap-3 text-black/70"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <button className="p-2 rounded bg-black/5 text-black/90" title="Video" type="button">
+                <IconVideo />
+              </button>
+              <button className="p-2 rounded bg-black/5 text-black/90" title="Call" type="button">
+                <IconCall />
+              </button>
+              <button className="p-2 rounded bg-black/5 text-black/90" title="Share" type="button">
+                <IconScreenShare />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-3 text-black/70">
-            <button className="p-2 rounded bg-black/5 text-black/90" title="Video">
-              <IconVideo />
-            </button>
-            <button className="p-2 rounded bg-black/5 text-black/90" title="Call">
-              <IconCall />
-            </button>
-            <button className="p-2 rounded bg-black/5 text-black/90" title="Share">
-              <IconScreenShare />
-            </button>
-          </div>
-        </div>
 
-        {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 bg-[#f5f5f5]">
-          {messages.map((m) => {
-            const isUser = m.sender === "user";
-            return (
-              <div key={m.id} className={`mb-4 ${isUser ? "text-right" : "text-left"}`}>
-                <div className="inline-block max-w-[75%]">
-                  <div
-                    className={`px-4 py-3 rounded-2xl shadow-sm border border-black/5 ${
-                      isUser ? "bg-[#d9fdd3]" : "bg-white"
-                    }`}
-                  >
-                    <div className="text-sm text-[#242424] whitespace-pre-wrap">{m.text}</div>
+          {/* Messages */}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 bg-[#f5f5f5]">
+            {messages.map((m) => {
+              const isUser = m.sender === "user";
+              return (
+                <div key={m.id} className={`mb-4 ${isUser ? "text-right" : "text-left"}`}>
+                  <div className="inline-block max-w-[75%]">
+                    <div
+                      className={`px-4 py-3 rounded-2xl shadow-sm border border-black/5 ${
+                        isUser ? "bg-[#d9fdd3]" : "bg-white"
+                      }`}
+                    >
+                      <div className="text-sm text-[#242424] whitespace-pre-wrap">{m.text}</div>
+                    </div>
+                    <div className="text-xs text-black/40 mt-1">{formatTime(m.timestamp)}</div>
                   </div>
-                  <div className="text-xs text-black/40 mt-1">{formatTime(m.timestamp)}</div>
+                </div>
+              );
+            })}
+
+            {isTyping && (
+              <div className="mb-4 text-left">
+                <div className="inline-block px-4 py-3 rounded-2xl bg-white border border-black/5 shadow-sm text-sm text-black/50 italic">
+                  Kevin is typing…
                 </div>
               </div>
-            );
-          })}
-
-          {isTyping && (
-            <div className="mb-4 text-left">
-              <div className="inline-block px-4 py-3 rounded-2xl bg-white border border-black/5 shadow-sm text-sm text-black/50 italic">
-                Kevin is typing…
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Composer */}
-        <form onSubmit={onSubmit} className="bg-white border-t border-black/10 p-3">
-          <div className="flex items-center gap-2 text-black/70">
-            <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Format">
-              <IconFormat />
-            </button>
-            <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Attach">
-              <IconAttach />
-            </button>
-            <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Emoji">
-              <IconEmoji />
-            </button>
-            <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="GIF">
-              <IconGif />
-            </button>
-
-            <input
-              ref={inputRef}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type a message"
-              className="flex-1 p-3 rounded-xl border border-black/10 bg-[#faf9f8] focus:outline-none"
-            />
-
-            <button
-              type="submit"
-              className="p-3 rounded-xl bg-[#464775] text-white hover:opacity-90 disabled:opacity-50"
-              disabled={isTyping || !inputValue.trim()}
-              title="Send"
-            >
-              <IconSend />
-            </button>
+            )}
           </div>
-        </form>
+
+          {/* Composer */}
+          <form onSubmit={onSubmit} className="bg-white border-t border-black/10 p-3">
+            <div className="flex items-center gap-2 text-black/70">
+              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Format">
+                <IconFormat />
+              </button>
+              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Attach">
+                <IconAttach />
+              </button>
+              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Emoji">
+                <IconEmoji />
+              </button>
+              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="GIF">
+                <IconGif />
+              </button>
+
+              <input
+                ref={inputRef}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Type a message"
+                className="flex-1 p-3 rounded-xl border border-black/10 bg-[#faf9f8] focus:outline-none"
+              />
+
+              <button
+                type="submit"
+                className="p-3 rounded-xl bg-[#464775] text-white hover:opacity-90 disabled:opacity-50"
+                disabled={isTyping || !inputValue.trim()}
+                title="Send"
+              >
+                <IconSend />
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

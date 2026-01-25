@@ -1,24 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation} from "react-router";
-import { useNavigate } from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import Taskbar from "../../component/Taskbar"; 
 
 type CallState = "IDLE" | "RINGING" | "CONNECTING" | "PLAYING";
-
 
 export default function Intro() {
   const [state, setState] = useState<CallState>("IDLE");
   const [seconds, setSeconds] = useState(0);
   const [isMaximized, setIsMaximized] = useState(false);
 
-  // Audio mute toggle (mutes the VOICE audio in your game)
   const [isMuted, setIsMuted] = useState(false);
 
-  // ✅ Camera toggle
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
-  // Draggable window position (only used when NOT maximized)
   const [winPos, setWinPos] = useState({ x: 0, y: 0 });
   const dragRef = useRef({
     dragging: false,
@@ -28,7 +23,6 @@ export default function Intro() {
     startY: 0,
   });
 
-  // Camera preview refs
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
@@ -61,18 +55,14 @@ export default function Intro() {
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   }
 
-  // Timer only runs while in call
   useEffect(() => {
     if (state !== "PLAYING") return;
     const id = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(id);
   }, [state]);
 
-  // Apply mute to the voice audio
   useEffect(() => {
-    if (voiceRef.current) {
-      voiceRef.current.muted = isMuted;
-    }
+    if (voiceRef.current) voiceRef.current.muted = isMuted;
   }, [isMuted]);
 
   async function triggerCall() {
@@ -98,8 +88,6 @@ export default function Intro() {
 
   async function startCamera() {
     setCameraError(null);
-
-    // If already running, do nothing
     if (mediaStreamRef.current) return;
 
     try {
@@ -124,16 +112,13 @@ export default function Intro() {
     if (stream) stream.getTracks().forEach((t) => t.stop());
     mediaStreamRef.current = null;
 
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
+    if (videoRef.current) videoRef.current.srcObject = null;
   }
 
-  async function toggleCamera() {
+  function toggleCamera() {
     setIsCameraOn((prev) => !prev);
   }
 
-  // When camera toggle changes during PLAYING, start/stop stream
   useEffect(() => {
     if (state !== "PLAYING") return;
 
@@ -141,7 +126,7 @@ export default function Intro() {
       startCamera();
     } else {
       stopCamera();
-      setCameraError(null); // show "Camera off" not "blocked"
+      setCameraError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCameraOn, state]);
@@ -156,12 +141,10 @@ export default function Intro() {
       setSeconds(0);
       setState("PLAYING");
 
-      // Reset window offset and camera
       setWinPos({ x: 0, y: 0 });
       setIsCameraOn(true);
       setCameraError(null);
 
-      // Start self view camera if enabled
       startCamera();
 
       try {
@@ -178,22 +161,15 @@ export default function Intro() {
   }
 
   function endCall() {
-  stopAll();
-  stopCamera();
-  hangUpRef.current?.play().catch(() => {});
+    stopAll();
+    stopCamera();
+    hangUpRef.current?.play().catch(() => {});
 
-  // Small delay so hang-up sound feels natural
-  setTimeout(() => {
-    navigate("/game");
-  }, 500);
-}
-
-
-  function goNext() {
-    navigate("/game"); // change to your next page route
+    setTimeout(() => {
+      navigate("/game");
+    }, 500);
   }
 
-  // Auto-trigger when coming from Start button
   useEffect(() => {
     if ((location.state as any)?.startCall) {
       triggerCall();
@@ -202,7 +178,6 @@ export default function Intro() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- Dragging logic ---
   function onMouseDownTopBar(e: React.MouseEvent) {
     if (isMaximized) return;
 
@@ -246,12 +221,10 @@ export default function Intro() {
         }
       : undefined;
 
-  // Self-view content decision
   const showSelfVideo = isCameraOn && !cameraError;
 
   return (
     <div style={styles.page}>
-      {/* Incoming call toast */}
       {(state === "RINGING" || state === "CONNECTING") && (
         <div style={styles.toastWrap}>
           <div style={styles.toast}>
@@ -280,20 +253,13 @@ export default function Intro() {
         </div>
       )}
 
-      {/* Windowed call UI */}
       {state === "PLAYING" && (
         <div style={windowStyle}>
-          {/* Top bar (drag handle) */}
           <div style={styles.topBar} onMouseDown={onMouseDownTopBar}>
             <div style={styles.searchFake}>Microsoft Teams</div>
 
-            {/* Stop drag from starting when clicking buttons */}
             <div style={styles.windowBtns} onMouseDown={(e) => e.stopPropagation()}>
-              <button
-                style={styles.winBtn}
-                onClick={() => setIsMaximized(false)}
-                title="Restore"
-              >
+              <button style={styles.winBtn} onClick={() => setIsMaximized(false)} title="Restore">
                 —
               </button>
               <button
@@ -309,11 +275,9 @@ export default function Intro() {
             </div>
           </div>
 
-          {/* Body */}
           <div style={styles.body}>
             <div style={styles.avatarBig}>{callerInitial}</div>
 
-            {/* Self-view video in bottom-right */}
             <div style={styles.selfView}>
               {showSelfVideo ? (
                 <video ref={videoRef} muted playsInline style={styles.selfVideo} />
@@ -325,7 +289,6 @@ export default function Intro() {
             </div>
           </div>
 
-          {/* Controls: time + mute + camera + hang up */}
           <div style={styles.controls}>
             <div style={styles.time}>{formatTime(seconds)}</div>
 
@@ -358,23 +321,30 @@ export default function Intro() {
         </div>
       )}
 
-      {/* Continue button after call ends */}
-      
-
-      {/* Audio */}
       <audio ref={ringtoneRef} src="/audio/ringtone.mp3" />
       <audio ref={connectRef} src="/audio/connect.mp3" />
       <audio ref={hangUpRef} src="/audio/hang-up.mp3" />
       <audio ref={voiceRef} src="/audio/teams_call_intro.wav" onEnded={endCall} />
+
+      {/* ✅ SAME TASKBAR AS GAME */}
+      <Taskbar showHome homeTo="/" />
     </div>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  page: { minHeight: "100vh", background: "transparent", position: "relative" },
+  // ✅ now matches Game typography/padding
+  page: {
+    minHeight: "100vh",
+    background: "transparent",
+    position: "relative",
+    padding: 24,
+    paddingBottom: 90, // ✅ space for taskbar
+    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+  },
 
   // Toast
-  toastWrap: { position: "fixed", right: 18, bottom: 18, zIndex: 9999 },
+  toastWrap: { position: "fixed", right: 18, bottom: 80, zIndex: 9999 }, // ⬅️ lifted above taskbar
   toast: {
     width: 330,
     background: "#111827",
@@ -439,17 +409,8 @@ const styles: Record<string, React.CSSProperties> = {
     left: "50%",
     top: "50%",
   },
-  windowed: {
-    width: 520,
-    height: 480,
-  },
-  maximized: {
-    inset: 0,
-    borderRadius: 0,
-    left: 0,
-    top: 0,
-    transform: "none",
-  },
+  windowed: { width: 520, height: 480 },
+  maximized: { inset: 0, borderRadius: 0, left: 0, top: 0, transform: "none" },
 
   topBar: {
     height: 40,
@@ -484,12 +445,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
 
-  body: {
-    flex: 1,
-    display: "grid",
-    placeItems: "center",
-    position: "relative",
-  },
+  body: { flex: 1, display: "grid", placeItems: "center", position: "relative" },
   avatarBig: {
     width: 120,
     height: 120,
@@ -502,7 +458,6 @@ const styles: Record<string, React.CSSProperties> = {
     placeItems: "center",
   },
 
-  // Self view (bottom-right)
   selfView: {
     position: "absolute",
     right: 14,
@@ -518,7 +473,7 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    transform: "scaleX(-1)", // mirror like real self-view
+    transform: "scaleX(-1)",
   },
   selfViewFallback: {
     width: "100%",
@@ -529,7 +484,6 @@ const styles: Record<string, React.CSSProperties> = {
     opacity: 0.8,
   },
 
-  // Controls
   controls: {
     height: 56,
     background: "#1F1F1F",
@@ -552,18 +506,4 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
   },
   hangBtn: { background: "rgba(220,38,38,0.85)" },
-
-  continueBtn: {
-    position: "fixed",
-    right: 18,
-    bottom: 18,
-    zIndex: 9999,
-    padding: "12px 16px",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.18)",
-    background: "rgba(255,255,255,0.10)",
-    color: "white",
-    fontWeight: 900,
-    cursor: "pointer",
-  },
 };
