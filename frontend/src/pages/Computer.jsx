@@ -240,11 +240,11 @@ const Computer = () => {
                 <hr />
 
                 <p style={{ color: "darkred", fontWeight: "bold" }}>
-                ⚠️ FICTIONAL DOCUMENT — FOR INTERNAL SIMULATION USE ONLY
+                ⚠️FOR INTERNAL USE ONLY
                 </p>
 
                 <h3>Desjardins Group</h3>
-                <p><strong>Document Type:</strong> Simulated Transaction Record</p>
+                <p><strong>Document Type:</strong>Transaction Record</p>
                 <p><strong>Generated:</strong> 2026-01-24 02:17 AM</p>
 
                 <hr />
