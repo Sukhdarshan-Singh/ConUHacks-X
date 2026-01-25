@@ -1,0 +1,7 @@
+/* Intro.css - Styles for the call interface */
+
+.Intro-container {
+    min-height: 100vh;
+    background: transparent;
+    position: relative;
+}
