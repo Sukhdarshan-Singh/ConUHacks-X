@@ -16,3 +16,6 @@ def get_config():
     if env == "production":
         return ProductionConfig
     return DevelopmentConfig
+
+STORY_PATH = os.getenv("STORY_PATH", "story/story.json")
+STATE_PATH = os.getenv("STATE_PATH", "state/state.json")

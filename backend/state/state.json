@@ -1,0 +1,27 @@
+{
+  "activeSceneKey": "scene1",
+  "scenes": {
+    "scene1": {
+      "sceneId": "scene_1",
+      "unlockedDocuments": [],
+      "flags": {},
+      "phase": "StartMenu",
+      "lastEventId": 0
+    },
+    "scene2": {
+      "sceneId": "scene_2",
+      "unlockedDocuments": [],
+      "flags": {},
+      "phase": "Introduction",
+      "lastEventId": 1
+    },
+    "scene3": {
+      "sceneId": "scene_3",
+      "unlockedDocuments": [],
+      "flags": {},
+      "phase": "Gameplay",
+      "lastEventId": 2
+    }
+  },
+  "events": []
+}
