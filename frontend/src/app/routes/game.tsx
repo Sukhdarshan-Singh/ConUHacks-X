@@ -1,6 +1,9 @@
+// frontend/src/app/routes/game.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Taskbar, { taskbarStyles } from "../../component/Taskbar"; // ✅ adjust path if needed
+import Taskbar, { taskbarStyles } from "../../component/Taskbar";
+
+import VideoLogo from "../../assets/Video_Logo.png";
 
 type DragState = {
   dragging: boolean;
@@ -13,6 +16,7 @@ type DragState = {
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
+
 
 type WindowKey = "transcript" | "clue" | "email";
 
@@ -298,7 +302,6 @@ Find out what really happened.”`,
   function phishingLinkClick() {
     emailInteraction.current.phishClicked = true;
 
-    // ✅ since /home is now redirecting to /, use "/" directly
     navigate("/", {
       replace: true,
       state: {
@@ -322,9 +325,21 @@ Find out what really happened.”`,
     <div style={styles.page}>
       <div style={{ color: "white" }}>
         <h1 style={{ marginTop: 0 }}>Desktop</h1>
-        <p style={{ opacity: 0.85 }}>
-          You’re “on a computer.” Windows will appear as events happen.
-        </p>
+        <p style={{ opacity: 0.85 }}>You’re “on a computer.” Windows will appear as events happen.</p>
+      </div>
+
+      {/* ✅ Desktop icon now routes to /chat */}
+      <div style={styles.desktopIcons}>
+        <button
+          style={styles.desktopIconBtn}
+          onClick={() => navigate("/chat")}
+          title="Open chat"
+        >
+          <div style={styles.desktopIconImgWrap}>
+            <img src={VideoLogo} alt="Chat icon" style={styles.desktopIconImg} />
+          </div>
+          <div style={styles.desktopIconLabel}>Chat</div>
+        </button>
       </div>
 
       <DesktopWindow
@@ -463,7 +478,6 @@ Find out what really happened.”`,
         </div>
       )}
 
-      {/* ✅ Shared Taskbar + your middle window icons */}
       <Taskbar
         showHome
         homeTo="/"
@@ -496,8 +510,47 @@ const styles: Record<string, React.CSSProperties> = {
     background: "transparent",
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     position: "relative",
-    paddingBottom: 90, // ✅ space for taskbar
+    paddingBottom: 90,
   },
+
+  desktopIcons: {
+    position: "fixed",
+    left: 26,
+    top: 120,
+    display: "flex",
+    flexDirection: "column",
+    gap: 14,
+    zIndex: 3000,
+    pointerEvents: "auto",
+  },
+  desktopIconBtn: {
+    width: 92,
+    padding: 10,
+    borderRadius: 14,
+    background: "rgba(17,24,39,0.25)",
+    border: "1px solid rgba(255,255,255,0.18)",
+    color: "white",
+    cursor: "pointer",
+    textAlign: "center",
+    backdropFilter: "blur(6px)",
+  },
+  desktopIconImgWrap: {
+    width: 48,
+    height: 48,
+    margin: "0 auto 8px",
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.10)",
+    border: "1px solid rgba(255,255,255,0.18)",
+    display: "grid",
+    placeItems: "center",
+  },
+  desktopIconImg: {
+    width: 34,
+    height: 34,
+    objectFit: "contain",
+    display: "block",
+  },
+  desktopIconLabel: { fontSize: 12, fontWeight: 900, opacity: 0.95 },
 
   noDimOverlay: {
     position: "fixed",

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 /* =========================
    Icons
 ========================= */
 const SW = 1.5;
 
+// ... (KEEP ALL YOUR ICONS EXACTLY THE SAME)
 const IconActivity = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
@@ -153,8 +155,6 @@ const IconSend = () => (
 /* =========================
    Helpers
 ========================= */
-const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
 async function postChat(characterId, message) {
   const res = await fetch(`/api/chat/${characterId}`, {
     method: "POST",
@@ -180,7 +180,6 @@ const formatTime = (d) => {
 };
 
 const makeInitialMessage = (characterId, characterName) => {
-  // You can customize these intros if you want.
   const defaults = {
     michelle: "State your request. Keep it relevant and brief.",
     elena: "If this is about the numbers, be specific.",
@@ -197,10 +196,11 @@ const makeInitialMessage = (characterId, characterName) => {
 };
 
 /* =========================
-   Chat Component
+   Chat Page (route)
 ========================= */
 export default function Chat() {
-  // Characters (frontend contact list)
+  const navigate = useNavigate();
+
   const contacts = [
     { id: "michelle", name: "Michelle Hale", role: "Head of IT Security", status: "Busy" },
     { id: "elena", name: "Elena Weiss", role: "Finance Manager", status: "Available" },
@@ -211,7 +211,6 @@ export default function Chat() {
   const [activeId, setActiveId] = useState("michelle");
   const active = contacts.find((c) => c.id === activeId) || contacts[0];
 
-  // Separate chat history per character
   const [convos, setConvos] = useState(() => {
     const init = {};
     for (const c of contacts) {
@@ -227,32 +226,14 @@ export default function Chat() {
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
-  // ----- Draggable window state -----
-  const [state, setState] = useState({
-    pos: { x: 0, y: 0 },
-    minimized: false,
-    maximized: false,
-  });
-
-  const drag = useRef({
-    dragging: false,
-    startMouseX: 0,
-    startMouseY: 0,
-    startX: 0,
-    startY: 0,
-  });
-
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, isTyping, activeId]);
 
   const send = async () => {
     const text = inputValue.trim();
     if (!text || isTyping) return;
 
-    // Add user message to current convo
     setConvos((prev) => ({
       ...prev,
       [activeId]: [
@@ -268,65 +249,15 @@ export default function Chat() {
 
     setIsTyping(false);
 
-    // Add character reply
     setConvos((prev) => ({
       ...prev,
       [activeId]: [
         ...(prev[activeId] || []),
-        {
-          id: (Date.now() + 1).toString(),
-          sender: activeId,
-          text: reply,
-          timestamp: new Date(),
-        },
+        { id: (Date.now() + 1).toString(), sender: activeId, text: reply, timestamp: new Date() },
       ],
     }));
 
     inputRef.current?.focus();
-  };
-
-  // Global mouse listeners for dragging
-  useEffect(() => {
-    function onMove(e) {
-      if (!drag.current.dragging) return;
-      if (state.maximized || state.minimized) return;
-
-      const dx = e.clientX - drag.current.startMouseX;
-      const dy = e.clientY - drag.current.startMouseY;
-
-      const nextX = drag.current.startX + dx;
-      const nextY = drag.current.startY + dy;
-
-      setState((prev) => ({
-        ...prev,
-        pos: {
-          x: clamp(nextX, -900, 900),
-          y: clamp(nextY, -650, 650),
-        },
-      }));
-    }
-
-    function onUp() {
-      drag.current.dragging = false;
-    }
-
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-  }, [state.maximized, state.minimized]);
-
-  // Start dragging (header)
-  const onDragMouseDown = (e) => {
-    if (state.maximized || state.minimized) return;
-
-    drag.current.dragging = true;
-    drag.current.startMouseX = e.clientX;
-    drag.current.startMouseY = e.clientY;
-    drag.current.startX = state.pos.x;
-    drag.current.startY = state.pos.y;
   };
 
   const onSubmit = (e) => {
@@ -341,178 +272,192 @@ export default function Chat() {
     }));
   };
 
-  // Sidebar “icon background” styles
   const sideBtn = "p-2 rounded-xl bg-white/15 text-white flex items-center justify-center";
   const sideBtnActive = "p-2 rounded-xl bg-white/30 text-white flex items-center justify-center";
 
   return (
-    <div className="fixed inset-0 bg-[#f3f2f1] overflow-hidden">
+    <div className="h-screen bg-[#f3f2f1] overflow-hidden flex flex-col">
+      {/* ✅ Top window bar with X */}
       <div
-        className="absolute inset-0 flex overflow-hidden"
-        style={{
-          transform: `translate3d(${state.pos.x}px, ${state.pos.y}px, 0)`,
-          transition: drag.current.dragging ? "none" : "transform 120ms ease-out",
-        }}
+        className="h-11 bg-[#E9EEF6] border-b border-black/10 flex items-center justify-between px-3 select-none"
+        style={{ fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" }}
       >
-        {/* Left app bar */}
-        <div className="w-16 bg-[#464775] flex flex-col items-center py-4 space-y-6">
-          <div className={sideBtn}>
-            <IconActivity />
-          </div>
-
-          <div className={sideBtnActive}>
-            <IconChat />
-          </div>
-
-          <div className={sideBtn}>
-            <IconTeams />
-          </div>
-
-          <div className={sideBtn}>
-            <IconCalendar />
-          </div>
-
-          <div className={`mt-auto ${sideBtn}`}>
-            <IconSettings />
-          </div>
+        <div className="font-extrabold text-[13px] flex items-center gap-2 text-[#111]">
+          💬 Secure Chat
         </div>
 
-        {/* Chat list */}
-        <div className="w-80 bg-[#edebe9] border-r border-black/10 flex flex-col">
-          <div className="p-4 flex items-center justify-between">
-            <div className="font-bold text-xl text-[#242424]">Chat</div>
-            <button
-              className="p-2 rounded bg-black/5 text-black/90"
-              title="New chat (reset current)"
-              type="button"
-              onClick={resetActiveChat}
-            >
-              <IconNewChat />
-            </button>
-          </div>
+        <button
+          onClick={() => {
+            // Prefer returning to desktop
+            try {
+              navigate("/game");
+            } catch {
+              navigate(-1);
+            }
+          }}
+          title="Close"
+          className="w-9 h-7 rounded-lg border border-black/10 bg-white/80 font-extrabold cursor-pointer"
+        >
+          ✕
+        </button>
+      </div>
 
-          <div className="px-4 pb-3">
-            <input className="w-full p-2 rounded border border-black/10 bg-white" placeholder="Search (UI only)" />
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            {contacts.map((c) => {
-              const selected = c.id === activeId;
-              return (
-                <div
-                  key={c.id}
-                  onClick={() => {
-                    setActiveId(c.id);
-                    setIsTyping(false);
-                    inputRef.current?.focus();
-                  }}
-                  className={`px-4 py-3 cursor-pointer ${
-                    selected ? "bg-[#e1dfdd]" : "hover:bg-[#e1dfdd]"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold text-[#242424]">{c.name}</div>
-                    <div className="text-xs text-black/50">{c.status}</div>
-                  </div>
-                  <div className="text-sm text-black/60">{c.role}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Chat window */}
-        <div className="flex-1 flex flex-col">
-          {/* Header (DRAG HANDLE) */}
-          <div
-            onMouseDown={onDragMouseDown}
-            className="h-14 bg-white border-b border-black/10 flex items-center justify-between px-4 select-none"
-            style={{ cursor: "grab" }}
-            title="Drag to move"
-          >
-            <div>
-              <div className="font-semibold text-[#242424]">
-                {active.name} ({active.role})
-              </div>
-              <div className="text-xs text-black/50">Terminal-style support</div>
+      {/* Chat content fills remaining height */}
+      <div className="flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 flex overflow-hidden">
+          {/* Left app bar */}
+          <div className="w-16 bg-[#464775] flex flex-col items-center py-4 space-y-6">
+            <div className={sideBtn}>
+              <IconActivity />
             </div>
 
-            <div className="flex items-center gap-3 text-black/70" onMouseDown={(e) => e.stopPropagation()}>
-              <button className="p-2 rounded bg-black/5 text-black/90" title="Video" type="button">
-                <IconVideo />
-              </button>
-              <button className="p-2 rounded bg-black/5 text-black/90" title="Call" type="button">
-                <IconCall />
-              </button>
-              <button className="p-2 rounded bg-black/5 text-black/90" title="Share" type="button">
-                <IconScreenShare />
-              </button>
+            <div className={sideBtnActive}>
+              <IconChat />
+            </div>
+
+            <div className={sideBtn}>
+              <IconTeams />
+            </div>
+
+            <div className={sideBtn}>
+              <IconCalendar />
+            </div>
+
+            <div className={`mt-auto ${sideBtn}`}>
+              <IconSettings />
             </div>
           </div>
 
-          {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 bg-[#f5f5f5]">
-            {messages.map((m) => {
-              const isUser = m.sender === "user";
-              return (
-                <div key={m.id} className={`mb-4 ${isUser ? "text-right" : "text-left"}`}>
-                  <div className="inline-block max-w-[75%]">
-                    <div
-                      className={`px-4 py-3 rounded-2xl shadow-sm border border-black/5 ${
-                        isUser ? "bg-[#d9fdd3]" : "bg-white"
-                      }`}
-                    >
-                      <div className="text-sm text-[#242424] whitespace-pre-wrap">{m.text}</div>
-                    </div>
-                    <div className="text-xs text-black/40 mt-1">{formatTime(m.timestamp)}</div>
-                  </div>
-                </div>
-              );
-            })}
-
-            {isTyping && (
-              <div className="mb-4 text-left">
-                <div className="inline-block px-4 py-3 rounded-2xl bg-white border border-black/5 shadow-sm text-sm text-black/50 italic">
-                  {active.name} is typing…
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Composer */}
-          <form onSubmit={onSubmit} className="bg-white border-t border-black/10 p-3">
-            <div className="flex items-center gap-2 text-black/70">
-              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Format">
-                <IconFormat />
-              </button>
-              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Attach">
-                <IconAttach />
-              </button>
-              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Emoji">
-                <IconEmoji />
-              </button>
-              <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="GIF">
-                <IconGif />
-              </button>
-
-              <input
-                ref={inputRef}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={`Message ${active.name}`}
-                className="flex-1 p-3 rounded-xl border border-black/10 bg-[#faf9f8] focus:outline-none"
-              />
-
+          {/* Chat list */}
+          <div className="w-80 bg-[#edebe9] border-r border-black/10 flex flex-col">
+            <div className="p-4 flex items-center justify-between">
+              <div className="font-bold text-xl text-[#242424]">Chat</div>
               <button
-                type="submit"
-                className="p-3 rounded-xl bg-[#464775] text-white hover:opacity-90 disabled:opacity-50"
-                disabled={isTyping || !inputValue.trim()}
-                title="Send"
+                className="p-2 rounded bg-black/5 text-black/90"
+                title="New chat (reset current)"
+                type="button"
+                onClick={resetActiveChat}
               >
-                <IconSend />
+                <IconNewChat />
               </button>
             </div>
-          </form>
+
+            <div className="px-4 pb-3">
+              <input className="w-full p-2 rounded border border-black/10 bg-white" placeholder="Search (UI only)" />
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {contacts.map((c) => {
+                const selected = c.id === activeId;
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => {
+                      setActiveId(c.id);
+                      setIsTyping(false);
+                      inputRef.current?.focus();
+                    }}
+                    className={`px-4 py-3 cursor-pointer ${selected ? "bg-[#e1dfdd]" : "hover:bg-[#e1dfdd]"}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold text-[#242424]">{c.name}</div>
+                      <div className="text-xs text-black/50">{c.status}</div>
+                    </div>
+                    <div className="text-sm text-black/60">{c.role}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Chat window */}
+          <div className="flex-1 flex flex-col">
+            {/* Header */}
+            <div className="h-14 bg-white border-b border-black/10 flex items-center justify-between px-4 select-none">
+              <div>
+                <div className="font-semibold text-[#242424]">
+                  {active.name} ({active.role})
+                </div>
+                <div className="text-xs text-black/50">Terminal-style support</div>
+              </div>
+
+              <div className="flex items-center gap-3 text-black/70">
+                <button className="p-2 rounded bg-black/5 text-black/90" title="Video" type="button">
+                  <IconVideo />
+                </button>
+                <button className="p-2 rounded bg-black/5 text-black/90" title="Call" type="button">
+                  <IconCall />
+                </button>
+                <button className="p-2 rounded bg-black/5 text-black/90" title="Share" type="button">
+                  <IconScreenShare />
+                </button>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 bg-[#f5f5f5]">
+              {messages.map((m) => {
+                const isUser = m.sender === "user";
+                return (
+                  <div key={m.id} className={`mb-4 ${isUser ? "text-right" : "text-left"}`}>
+                    <div className="inline-block max-w-[75%]">
+                      <div
+                        className={`px-4 py-3 rounded-2xl shadow-sm border border-black/5 ${
+                          isUser ? "bg-[#d9fdd3]" : "bg-white"
+                        }`}
+                      >
+                        <div className="text-sm text-[#242424] whitespace-pre-wrap">{m.text}</div>
+                      </div>
+                      <div className="text-xs text-black/40 mt-1">{formatTime(m.timestamp)}</div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {isTyping && (
+                <div className="mb-4 text-left">
+                  <div className="inline-block px-4 py-3 rounded-2xl bg-white border border-black/5 shadow-sm text-sm text-black/50 italic">
+                    {active.name} is typing…
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Composer */}
+            <form onSubmit={onSubmit} className="bg-white border-t border-black/10 p-3">
+              <div className="flex items-center gap-2 text-black/70">
+                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Format">
+                  <IconFormat />
+                </button>
+                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Attach">
+                  <IconAttach />
+                </button>
+                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Emoji">
+                  <IconEmoji />
+                </button>
+                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="GIF">
+                  <IconGif />
+                </button>
+
+                <input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder={`Message ${active.name}`}
+                  className="flex-1 p-3 rounded-xl border border-black/10 bg-[#faf9f8] focus:outline-none"
+                />
+
+                <button
+                  type="submit"
+                  className="p-3 rounded-xl bg-[#464775] text-white hover:opacity-90 disabled:opacity-50"
+                  disabled={isTyping || !inputValue.trim()}
+                  title="Send"
+                >
+                  <IconSend />
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
