@@ -32,3 +32,13 @@ copy .env  # Windows PowerShell: Copy-Item .env.example .env
 
 #run app
 python wsgi.py
+
+#Run app locally 
+#back end
+python -m flask run
+
+#front end
+npm run dev
+
+#deploy Render
+https://conuhacks-x.onrender.com/
