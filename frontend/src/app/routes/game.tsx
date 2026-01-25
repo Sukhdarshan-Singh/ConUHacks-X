@@ -494,7 +494,7 @@ Find out what really happened.”`,
         <button
         type="button"
           style={styles.desktopIconBtn}
-          onClick={() => window.location.assign("/chat")}
+          onClick={() => navigate("/chat")}
           title="Open chat"
         >
           <div style={styles.desktopIconImgWrap}>

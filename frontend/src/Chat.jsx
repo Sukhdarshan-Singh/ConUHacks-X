@@ -2,13 +2,248 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* =========================
+   Styles (NO Tailwind needed)
+========================= */
+const S = {
+  page: {
+    height: "100vh",
+    width: "100%",
+    background: "#f3f2f1",
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+    fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+  },
+  topBar: {
+    height: 44,
+    background: "#E9EEF6",
+    borderBottom: "1px solid rgba(0,0,0,0.1)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 12px",
+    userSelect: "none",
+  },
+  topTitle: {
+    fontWeight: 800,
+    fontSize: 13,
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    color: "#111",
+  },
+  closeBtn: {
+    width: 36,
+    height: 28,
+    borderRadius: 10,
+    border: "1px solid rgba(0,0,0,0.1)",
+    background: "rgba(255,255,255,0.8)",
+    fontWeight: 800,
+    cursor: "pointer",
+  },
+
+  content: {
+    flex: 1,
+    position: "relative",
+    overflow: "hidden",
+  },
+  contentInner: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    overflow: "hidden",
+  },
+
+  leftBar: {
+    width: 64,
+    background: "#464775",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "16px 0",
+    gap: 18,
+  },
+  leftBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.15)",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "none",
+    cursor: "pointer",
+  },
+  leftBtnActive: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    background: "rgba(255,255,255,0.30)",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "none",
+    cursor: "pointer",
+  },
+  leftBottomWrap: { marginTop: "auto" },
+
+  list: {
+    width: 320,
+    background: "#edebe9",
+    borderRight: "1px solid rgba(0,0,0,0.1)",
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  listHeader: {
+    padding: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  listTitle: {
+    fontWeight: 800,
+    fontSize: 22,
+    color: "#242424",
+  },
+  tinyBtn: {
+    padding: 10,
+    borderRadius: 10,
+    background: "rgba(0,0,0,0.05)",
+    border: "none",
+    cursor: "pointer",
+    color: "rgba(0,0,0,0.9)",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  searchWrap: { padding: "0 16px 12px" },
+  search: {
+    width: "100%",
+    padding: 10,
+    borderRadius: 10,
+    border: "1px solid rgba(0,0,0,0.10)",
+    background: "#fff",
+    outline: "none",
+  },
+  listScroll: {
+    flex: 1,
+    overflowY: "auto",
+  },
+  contactRow: (selected) => ({
+    padding: "12px 16px",
+    cursor: "pointer",
+    background: selected ? "#e1dfdd" : "transparent",
+  }),
+  contactRowHover: {
+    background: "#e1dfdd",
+  },
+  contactTop: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  contactName: { fontWeight: 700, color: "#242424" },
+  contactStatus: { fontSize: 12, color: "rgba(0,0,0,0.5)" },
+  contactRole: { fontSize: 14, color: "rgba(0,0,0,0.60)", marginTop: 2 },
+
+  chatCol: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+    background: "#fff",
+  },
+  chatHeader: {
+    height: 56,
+    background: "#fff",
+    borderBottom: "1px solid rgba(0,0,0,0.10)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 16px",
+    userSelect: "none",
+  },
+  chatHeaderName: { fontWeight: 700, color: "#242424" },
+  chatHeaderSub: { fontSize: 12, color: "rgba(0,0,0,0.50)", marginTop: 2 },
+  headerBtns: { display: "flex", gap: 10, color: "rgba(0,0,0,0.70)" },
+
+  messages: {
+    flex: 1,
+    overflowY: "auto",
+    padding: 24,
+    background: "#f5f5f5",
+  },
+  msgRow: (isUser) => ({
+    marginBottom: 16,
+    textAlign: isUser ? "right" : "left",
+  }),
+  msgBubbleWrap: { display: "inline-block", maxWidth: "75%" },
+  msgBubble: (isUser) => ({
+    padding: "12px 16px",
+    borderRadius: 18,
+    background: isUser ? "#d9fdd3" : "#ffffff",
+    border: "1px solid rgba(0,0,0,0.06)",
+    boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+  }),
+  msgText: { fontSize: 14, color: "#242424", whiteSpace: "pre-wrap" },
+  msgTime: { fontSize: 12, color: "rgba(0,0,0,0.40)", marginTop: 6 },
+  typing: {
+    display: "inline-block",
+    padding: "12px 16px",
+    borderRadius: 18,
+    background: "#fff",
+    border: "1px solid rgba(0,0,0,0.06)",
+    boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+    fontSize: 14,
+    color: "rgba(0,0,0,0.55)",
+    fontStyle: "italic",
+  },
+
+  composer: {
+    background: "#fff",
+    borderTop: "1px solid rgba(0,0,0,0.10)",
+    padding: 12,
+  },
+  composerRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    color: "rgba(0,0,0,0.70)",
+  },
+  input: {
+    flex: 1,
+    padding: "12px 14px",
+    borderRadius: 14,
+    border: "1px solid rgba(0,0,0,0.10)",
+    background: "#faf9f8",
+    outline: "none",
+    fontSize: 14,
+  },
+  sendBtn: (disabled) => ({
+    padding: 12,
+    borderRadius: 14,
+    border: "none",
+    background: "#464775",
+    color: "#fff",
+    cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? 0.55 : 1,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }),
+};
+
+/* =========================
    Icons
 ========================= */
 const SW = 1.5;
 
-// ... (KEEP ALL YOUR ICONS EXACTLY THE SAME)
 const IconActivity = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 24, height: 24 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -19,7 +254,7 @@ const IconActivity = () => (
 );
 
 const IconChat = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 24, height: 24 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -30,7 +265,7 @@ const IconChat = () => (
 );
 
 const IconTeams = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 24, height: 24 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -41,7 +276,7 @@ const IconTeams = () => (
 );
 
 const IconCalendar = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 24, height: 24 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -52,7 +287,7 @@ const IconCalendar = () => (
 );
 
 const IconSettings = () => (
-  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 24, height: 24 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -64,7 +299,7 @@ const IconSettings = () => (
 );
 
 const IconNewChat = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -75,7 +310,7 @@ const IconNewChat = () => (
 );
 
 const IconVideo = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -86,7 +321,7 @@ const IconVideo = () => (
 );
 
 const IconCall = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -97,7 +332,7 @@ const IconCall = () => (
 );
 
 const IconScreenShare = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -108,13 +343,13 @@ const IconScreenShare = () => (
 );
 
 const IconFormat = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={SW} d="M4 6h16M4 12h16m-7 6h7" />
   </svg>
 );
 
 const IconAttach = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -125,7 +360,7 @@ const IconAttach = () => (
 );
 
 const IconEmoji = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -136,7 +371,7 @@ const IconEmoji = () => (
 );
 
 const IconGif = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -147,7 +382,7 @@ const IconGif = () => (
 );
 
 const IconSend = () => (
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={SW} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
   </svg>
 );
@@ -272,23 +507,14 @@ export default function Chat() {
     }));
   };
 
-  const sideBtn = "p-2 rounded-xl bg-white/15 text-white flex items-center justify-center";
-  const sideBtnActive = "p-2 rounded-xl bg-white/30 text-white flex items-center justify-center";
-
   return (
-    <div className="h-screen bg-[#f3f2f1] overflow-hidden flex flex-col">
-      {/* ✅ Top window bar with X */}
-      <div
-        className="h-11 bg-[#E9EEF6] border-b border-black/10 flex items-center justify-between px-3 select-none"
-        style={{ fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" }}
-      >
-        <div className="font-extrabold text-[13px] flex items-center gap-2 text-[#111]">
-          💬 Secure Chat
-        </div>
+    <div style={S.page}>
+      {/* Top window bar with X */}
+      <div style={S.topBar}>
+        <div style={S.topTitle}>💬 Secure Chat</div>
 
         <button
           onClick={() => {
-            // Prefer returning to desktop
             try {
               navigate("/game");
             } catch {
@@ -296,44 +522,46 @@ export default function Chat() {
             }
           }}
           title="Close"
-          className="w-9 h-7 rounded-lg border border-black/10 bg-white/80 font-extrabold cursor-pointer"
+          type="button"
+          style={S.closeBtn}
         >
           ✕
         </button>
       </div>
 
-      {/* Chat content fills remaining height */}
-      <div className="flex-1 relative overflow-hidden">
-        <div className="absolute inset-0 flex overflow-hidden">
+      <div style={S.content}>
+        <div style={S.contentInner}>
           {/* Left app bar */}
-          <div className="w-16 bg-[#464775] flex flex-col items-center py-4 space-y-6">
-            <div className={sideBtn}>
+          <div style={S.leftBar}>
+            <button type="button" style={S.leftBtn} title="Activity">
               <IconActivity />
-            </div>
+            </button>
 
-            <div className={sideBtnActive}>
+            <button type="button" style={S.leftBtnActive} title="Chat">
               <IconChat />
-            </div>
+            </button>
 
-            <div className={sideBtn}>
+            <button type="button" style={S.leftBtn} title="Teams">
               <IconTeams />
-            </div>
+            </button>
 
-            <div className={sideBtn}>
+            <button type="button" style={S.leftBtn} title="Calendar">
               <IconCalendar />
-            </div>
+            </button>
 
-            <div className={`mt-auto ${sideBtn}`}>
-              <IconSettings />
+            <div style={S.leftBottomWrap}>
+              <button type="button" style={S.leftBtn} title="Settings">
+                <IconSettings />
+              </button>
             </div>
           </div>
 
           {/* Chat list */}
-          <div className="w-80 bg-[#edebe9] border-r border-black/10 flex flex-col">
-            <div className="p-4 flex items-center justify-between">
-              <div className="font-bold text-xl text-[#242424]">Chat</div>
+          <div style={S.list}>
+            <div style={S.listHeader}>
+              <div style={S.listTitle}>Chat</div>
               <button
-                className="p-2 rounded bg-black/5 text-black/90"
+                style={S.tinyBtn}
                 title="New chat (reset current)"
                 type="button"
                 onClick={resetActiveChat}
@@ -342,11 +570,11 @@ export default function Chat() {
               </button>
             </div>
 
-            <div className="px-4 pb-3">
-              <input className="w-full p-2 rounded border border-black/10 bg-white" placeholder="Search (UI only)" />
+            <div style={S.searchWrap}>
+              <input style={S.search} placeholder="Search (UI only)" />
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div style={S.listScroll}>
               {contacts.map((c) => {
                 const selected = c.id === activeId;
                 return (
@@ -357,13 +585,19 @@ export default function Chat() {
                       setIsTyping(false);
                       inputRef.current?.focus();
                     }}
-                    className={`px-4 py-3 cursor-pointer ${selected ? "bg-[#e1dfdd]" : "hover:bg-[#e1dfdd]"}`}
+                    style={S.contactRow(selected)}
+                    onMouseEnter={(e) => {
+                      if (!selected) e.currentTarget.style.background = S.contactRowHover.background;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!selected) e.currentTarget.style.background = "transparent";
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="font-semibold text-[#242424]">{c.name}</div>
-                      <div className="text-xs text-black/50">{c.status}</div>
+                    <div style={S.contactTop}>
+                      <div style={S.contactName}>{c.name}</div>
+                      <div style={S.contactStatus}>{c.status}</div>
                     </div>
-                    <div className="text-sm text-black/60">{c.role}</div>
+                    <div style={S.contactRole}>{c.role}</div>
                   </div>
                 );
               })}
@@ -371,71 +605,65 @@ export default function Chat() {
           </div>
 
           {/* Chat window */}
-          <div className="flex-1 flex flex-col">
+          <div style={S.chatCol}>
             {/* Header */}
-            <div className="h-14 bg-white border-b border-black/10 flex items-center justify-between px-4 select-none">
+            <div style={S.chatHeader}>
               <div>
-                <div className="font-semibold text-[#242424]">
+                <div style={S.chatHeaderName}>
                   {active.name} ({active.role})
                 </div>
-                <div className="text-xs text-black/50">Terminal-style support</div>
+                <div style={S.chatHeaderSub}>Terminal-style support</div>
               </div>
 
-              <div className="flex items-center gap-3 text-black/70">
-                <button className="p-2 rounded bg-black/5 text-black/90" title="Video" type="button">
+              <div style={S.headerBtns}>
+                <button style={S.tinyBtn} title="Video" type="button">
                   <IconVideo />
                 </button>
-                <button className="p-2 rounded bg-black/5 text-black/90" title="Call" type="button">
+                <button style={S.tinyBtn} title="Call" type="button">
                   <IconCall />
                 </button>
-                <button className="p-2 rounded bg-black/5 text-black/90" title="Share" type="button">
+                <button style={S.tinyBtn} title="Share" type="button">
                   <IconScreenShare />
                 </button>
               </div>
             </div>
 
             {/* Messages */}
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 bg-[#f5f5f5]">
+            <div ref={scrollRef} style={S.messages}>
               {messages.map((m) => {
                 const isUser = m.sender === "user";
                 return (
-                  <div key={m.id} className={`mb-4 ${isUser ? "text-right" : "text-left"}`}>
-                    <div className="inline-block max-w-[75%]">
-                      <div
-                        className={`px-4 py-3 rounded-2xl shadow-sm border border-black/5 ${
-                          isUser ? "bg-[#d9fdd3]" : "bg-white"
-                        }`}
-                      >
-                        <div className="text-sm text-[#242424] whitespace-pre-wrap">{m.text}</div>
+                  <div key={m.id} style={S.msgRow(isUser)}>
+                    <div style={S.msgBubbleWrap}>
+                      <div style={S.msgBubble(isUser)}>
+                        <div style={S.msgText}>{m.text}</div>
                       </div>
-                      <div className="text-xs text-black/40 mt-1">{formatTime(m.timestamp)}</div>
+                      <div style={S.msgTime}>{formatTime(m.timestamp)}</div>
                     </div>
                   </div>
                 );
               })}
 
               {isTyping && (
-                <div className="mb-4 text-left">
-                  <div className="inline-block px-4 py-3 rounded-2xl bg-white border border-black/5 shadow-sm text-sm text-black/50 italic">
-                    {active.name} is typing…
-                  </div>
+                <div style={S.msgRow(false)}>
+                  <div style={S.typing}>{active.name} is typing…</div>
                 </div>
               )}
             </div>
 
             {/* Composer */}
-            <form onSubmit={onSubmit} className="bg-white border-t border-black/10 p-3">
-              <div className="flex items-center gap-2 text-black/70">
-                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Format">
+            <form onSubmit={onSubmit} style={S.composer}>
+              <div style={S.composerRow}>
+                <button type="button" style={S.tinyBtn} title="Format">
                   <IconFormat />
                 </button>
-                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Attach">
+                <button type="button" style={S.tinyBtn} title="Attach">
                   <IconAttach />
                 </button>
-                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="Emoji">
+                <button type="button" style={S.tinyBtn} title="Emoji">
                   <IconEmoji />
                 </button>
-                <button type="button" className="p-2 rounded bg-black/5 text-black/90" title="GIF">
+                <button type="button" style={S.tinyBtn} title="GIF">
                   <IconGif />
                 </button>
 
@@ -444,12 +672,12 @@ export default function Chat() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={`Message ${active.name}`}
-                  className="flex-1 p-3 rounded-xl border border-black/10 bg-[#faf9f8] focus:outline-none"
+                  style={S.input}
                 />
 
                 <button
                   type="submit"
-                  className="p-3 rounded-xl bg-[#464775] text-white hover:opacity-90 disabled:opacity-50"
+                  style={S.sendBtn(isTyping || !inputValue.trim())}
                   disabled={isTyping || !inputValue.trim()}
                   title="Send"
                 >
