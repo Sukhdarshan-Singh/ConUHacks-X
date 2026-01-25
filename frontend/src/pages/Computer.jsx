@@ -128,13 +128,6 @@ Truth: Fell for phishing email</p>
         )}
       />
 
-      {
-        <button type="button" onclick="alert('Button clicked!')">
-            <img src={Video_Logo} alt="Video streaming application logo"/>
-        </button>
-
-      }
-
     </div>
   );
 };
