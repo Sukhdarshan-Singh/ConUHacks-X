@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Taskbar, { taskbarStyles } from "../../component/Taskbar"; // ✅ adjust path if needed
 
 type DragState = {
   dragging: boolean;
@@ -27,7 +28,7 @@ type WinState = {
 type WinConfig = {
   key: WindowKey;
   title: string;
-  icon: string; // emoji icon for taskbar
+  icon: string;
   defaultPos: { x: number; y: number };
   defaultSize: { w: number; h: number };
 };
@@ -161,12 +162,7 @@ function DesktopWindow({
 
   return (
     <div style={styles.noDimOverlay}>
-      <div
-        style={winStyle}
-        onMouseDown={() => bringToFront()}
-        role="dialog"
-        aria-label={cfg.title}
-      >
+      <div style={winStyle} onMouseDown={() => bringToFront()} role="dialog" aria-label={cfg.title}>
         <div style={styles.titleBar} onMouseDown={onMouseDownTitle}>
           <div style={styles.titleText}>
             <span style={{ marginRight: 8 }}>{cfg.icon}</span>
@@ -203,30 +199,20 @@ function DesktopWindow({
 export default function Game() {
   const navigate = useNavigate();
 
-  // Email notif + email window states
   const [showEmailNotif, setShowEmailNotif] = useState(false);
 
-  // Track user actions for phishing logic
   const emailInteraction = useRef({
     opened: false,
     phishClicked: false,
   });
 
-  // Z-index manager
   const [zTop, setZTop] = useState(10);
 
   const [wins, setWins] = useState<Record<WindowKey, WinState>>(() => ({
-    transcript: { ...createDefaultWinState("transcript", 10), open: true }, // open by default
+    transcript: { ...createDefaultWinState("transcript", 10), open: true },
     clue: createDefaultWinState("clue", 9),
     email: createDefaultWinState("email", 8),
   }));
-
-  // Clock in taskbar
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
 
   const transcriptText = useMemo(
     () =>
@@ -240,7 +226,6 @@ Find out what really happened.”`,
     []
   );
 
-  // Trigger email notification after 60 seconds
   useEffect(() => {
     const timer = setTimeout(() => setShowEmailNotif(true), 60_000);
     return () => clearTimeout(timer);
@@ -288,7 +273,6 @@ Find out what really happened.”`,
     }
   }
 
-  // Email notification actions
   function openEmailFromNotif() {
     setShowEmailNotif(false);
     emailInteraction.current.opened = true;
@@ -300,7 +284,6 @@ Find out what really happened.”`,
     openWin("clue");
   }
 
-  // If user closes email window without clicking phishing link => give clue
   function closeEmailWindow() {
     closeWin("email");
 
@@ -312,11 +295,11 @@ Find out what really happened.”`,
     }
   }
 
-  // Phishing link click => go to home with a warning message
   function phishingLinkClick() {
     emailInteraction.current.phishClicked = true;
 
-    navigate("/home", {
+    // ✅ since /home is now redirecting to /, use "/" directly
+    navigate("/", {
       replace: true,
       state: {
         fail: true,
@@ -326,7 +309,6 @@ Find out what really happened.”`,
     });
   }
 
-  // Taskbar icons for open windows (including minimized ones)
   const openIcons = (Object.keys(wins) as WindowKey[])
     .filter((k) => wins[k].open)
     .map((k) => ({
@@ -336,12 +318,8 @@ Find out what really happened.”`,
       minimized: wins[k].minimized,
     }));
 
-  const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  const dateStr = now.toLocaleDateString([], { month: "2-digit", day: "2-digit", year: "numeric" });
-
   return (
     <div style={styles.page}>
-      {/* (Your gameplay content can be here) */}
       <div style={{ color: "white" }}>
         <h1 style={{ marginTop: 0 }}>Desktop</h1>
         <p style={{ opacity: 0.85 }}>
@@ -349,7 +327,6 @@ Find out what really happened.”`,
         </p>
       </div>
 
-      {/* Meeting Transcript Window (scrollable) */}
       <DesktopWindow
         winKey="transcript"
         state={wins.transcript}
@@ -360,7 +337,6 @@ Find out what really happened.”`,
         <div style={{ padding: 14, height: "100%", boxSizing: "border-box" }}>
           <div style={{ fontWeight: 900, marginBottom: 10 }}>Confidential — Internal Use</div>
 
-          {/* ✅ Always scrollable */}
           <div style={styles.transcriptScroll}>
             {transcriptText.split("\n").map((line, idx) => (
               <div key={idx} style={{ marginBottom: 8 }}>
@@ -371,7 +347,6 @@ Find out what really happened.”`,
         </div>
       </DesktopWindow>
 
-      {/* Email Window */}
       <DesktopWindow
         winKey="email"
         state={wins.email}
@@ -392,9 +367,7 @@ Find out what really happened.”`,
           <b>IT Service Desk &lt;it-help@ardentis.com&gt;</b>
         </div>
 
-        <div style={styles.subjectLine}>
-          ⚠️ Action Required: Irregular SAP Postings Detected
-        </div>
+        <div style={styles.subjectLine}>⚠️ Action Required: Irregular SAP Postings Detected</div>
 
         <div style={styles.emailScrollBody}>
           <p style={styles.p}>Hello David,</p>
@@ -405,8 +378,8 @@ Find out what really happened.”`,
           </p>
 
           <p style={styles.p}>
-            As a precautionary measure, we are required to revalidate executive credentials to
-            prevent posting delays or system access restrictions.
+            As a precautionary measure, we are required to revalidate executive credentials to prevent
+            posting delays or system access restrictions.
           </p>
 
           <div style={styles.sectionTitle}>What you need to do:</div>
@@ -423,8 +396,8 @@ Find out what really happened.”`,
           </div>
 
           <p style={styles.p}>
-            This verification must be completed within <b>30 minutes</b> to avoid temporary
-            suspension of posting authority.
+            This verification must be completed within <b>30 minutes</b> to avoid temporary suspension
+            of posting authority.
           </p>
 
           <p style={styles.p}>
@@ -440,13 +413,10 @@ Find out what really happened.”`,
             Ardentis Financial Group
           </div>
 
-          <div style={styles.autoNote}>
-            This message was generated automatically. Do not reply.
-          </div>
+          <div style={styles.autoNote}>This message was generated automatically. Do not reply.</div>
         </div>
       </DesktopWindow>
 
-      {/* Clue Window */}
       <DesktopWindow
         winKey="clue"
         state={wins.clue}
@@ -468,14 +438,13 @@ Find out what really happened.”`,
         </div>
       </DesktopWindow>
 
-      {/* Email notification prompt (modal) */}
       {showEmailNotif && (
         <div style={styles.overlayDim}>
           <div style={styles.notification}>
             <div style={{ fontWeight: 900, marginBottom: 6 }}>📧 New email</div>
             <div style={{ fontSize: 13, opacity: 0.85 }}>
               <div>
-                <b>From:</b> SAP Support
+                <b>From:</b> SAP-Support@arclentis-support.com
               </div>
               <div>
                 <b>Subject:</b> ⚠️ Action Required: Irregular SAP Postings Detected
@@ -494,57 +463,28 @@ Find out what really happened.”`,
         </div>
       )}
 
-      {/* ✅ Windows-like taskbar */}
-      <div style={styles.taskbar}>
-        {/* Left: Start + Home */}
-        <div style={styles.taskLeft}>
-          <button
-            style={styles.startBtn}
-            title="Start"
-            onClick={() => alert("Start menu not implemented yet")}
-          >
-            ⊞
-          </button>
-
-          <button
-            style={styles.homeBtn}
-            title="Home"
-            onClick={() => navigate("/home")}
-          >
-            🏠
-          </button>
-        </div>
-
-        {/* Middle: window icons */}
-        <div style={styles.taskMid}>
-          {openIcons.map((it) => (
-            <button
-              key={it.key}
-              style={{
-                ...styles.taskIcon,
-                ...(it.minimized ? styles.taskIconMin : styles.taskIconActive),
-              }}
-              onClick={() => toggleRestore(it.key)}
-              title={it.title}
-            >
-              <span style={{ fontSize: 18 }}>{it.icon}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Right: system tray */}
-        <div style={styles.taskRight}>
-          <div style={styles.trayIcons}>
-            <span title="Wi-Fi">📶</span>
-            <span title="Volume">🔊</span>
-            <span title="Battery">🔋</span>
-          </div>
-          <div style={styles.clock}>
-            <div style={{ fontSize: 12 }}>{timeStr}</div>
-            <div style={{ fontSize: 11, opacity: 0.75 }}>{dateStr}</div>
-          </div>
-        </div>
-      </div>
+      {/* ✅ Shared Taskbar + your middle window icons */}
+      <Taskbar
+        showHome
+        homeTo="/"
+        middle={
+          <>
+            {openIcons.map((it) => (
+              <button
+                key={it.key}
+                style={{
+                  ...taskbarStyles.taskIcon,
+                  ...(it.minimized ? taskbarStyles.taskIconMin : taskbarStyles.taskIconActive),
+                }}
+                onClick={() => toggleRestore(it.key)}
+                title={it.title}
+              >
+                <span style={{ fontSize: 18 }}>{it.icon}</span>
+              </button>
+            ))}
+          </>
+        }
+      />
     </div>
   );
 }
@@ -556,10 +496,9 @@ const styles: Record<string, React.CSSProperties> = {
     background: "transparent",
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     position: "relative",
-    paddingBottom: 90,
+    paddingBottom: 90, // ✅ space for taskbar
   },
 
-  // Window overlay that doesn't dim
   noDimOverlay: {
     position: "fixed",
     inset: 0,
@@ -627,7 +566,6 @@ const styles: Record<string, React.CSSProperties> = {
     background: "#fff",
   },
 
-  // Transcript scroll
   transcriptScroll: {
     height: "calc(100% - 40px)",
     overflowY: "auto",
@@ -640,7 +578,6 @@ const styles: Record<string, React.CSSProperties> = {
     whiteSpace: "pre-wrap",
   },
 
-  // Email notification prompt
   notification: {
     width: 380,
     background: "#111827",
@@ -672,7 +609,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 900,
   },
 
-  // Email styles
   emailMetaLine: {
     padding: "8px 12px",
     borderBottom: "1px solid rgba(0,0,0,0.08)",
@@ -703,85 +639,4 @@ const styles: Record<string, React.CSSProperties> = {
   },
   signature: { marginTop: 14, whiteSpace: "pre-line" },
   autoNote: { marginTop: 12, fontSize: 12, opacity: 0.7 },
-
-  // Taskbar (Windows-ish)
-  taskbar: {
-    position: "fixed",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 56,
-    background: "rgba(240,245,255,0.75)",
-    backdropFilter: "blur(10px)",
-    borderTop: "1px solid rgba(0,0,0,0.10)",
-    display: "flex",
-    alignItems: "center",
-    padding: "0 10px",
-    zIndex: 12000,
-  },
-
-  taskLeft: { display: "flex", gap: 8, alignItems: "center", width: 120 },
-
-  startBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    border: "1px solid rgba(0,0,0,0.12)",
-    background: "rgba(255,255,255,0.65)",
-    cursor: "pointer",
-    fontSize: 18,
-  },
-
-  homeBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    border: "1px solid rgba(0,0,0,0.12)",
-    background: "rgba(255,255,255,0.55)",
-    cursor: "pointer",
-    fontSize: 16,
-  },
-
-  taskMid: { display: "flex", gap: 8, alignItems: "center", flex: 1 },
-
-  taskIcon: {
-    width: 44,
-    height: 42,
-    borderRadius: 12,
-    border: "1px solid rgba(0,0,0,0.12)",
-    background: "rgba(255,255,255,0.55)",
-    cursor: "pointer",
-    display: "grid",
-    placeItems: "center",
-  },
-
-  taskIconActive: {
-    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-  },
-
-  taskIconMin: {
-    opacity: 0.7,
-  },
-
-  taskRight: {
-    display: "flex",
-    gap: 12,
-    alignItems: "center",
-    justifyContent: "flex-end",
-    width: 220,
-    color: "rgba(0,0,0,0.85)",
-  },
-
-  trayIcons: {
-    display: "flex",
-    gap: 10,
-    fontSize: 16,
-    opacity: 0.9,
-  },
-
-  clock: {
-    textAlign: "right",
-    lineHeight: 1.1,
-    paddingRight: 6,
-  },
 };
