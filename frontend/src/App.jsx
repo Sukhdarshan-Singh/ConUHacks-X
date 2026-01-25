@@ -1,5 +1,13 @@
+import { useState } from 'react'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import Computer from './pages/Computer'; 
+import Home from './pages/Home'; 
+import Intro from './pages/Intro'; 
+import Navbar from './component/Navbar';
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
 import React from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 import Home from "./app/routes/home";
 import Intro from "./app/routes/intro";
