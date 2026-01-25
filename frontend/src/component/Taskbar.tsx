@@ -127,3 +127,5 @@ const styles: Record<string, React.CSSProperties> = {
     paddingRight: 6,
   },
 };
+
+export const taskbarStyles = styles;
