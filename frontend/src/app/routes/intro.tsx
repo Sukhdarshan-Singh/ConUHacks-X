@@ -1,6 +1,7 @@
+// frontend/src/app/routes/intro.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Taskbar from "../../component/Taskbar"; 
+import Taskbar from "../../component/Taskbar";
 
 type CallState = "IDLE" | "RINGING" | "CONNECTING" | "PLAYING";
 
@@ -165,13 +166,19 @@ export default function Intro() {
     stopCamera();
     hangUpRef.current?.play().catch(() => {});
 
+    // ✅ Ensure transcript shows again when you land in /game
+    localStorage.setItem("transcriptRead", "0");
+
     setTimeout(() => {
-      navigate("/game");
+      navigate("/game", { state: { fromIntro: true } });
     }, 500);
   }
 
   useEffect(() => {
     if ((location.state as any)?.startCall) {
+      // ✅ Fresh run: show transcript again later
+      localStorage.setItem("transcriptRead", "0");
+
       triggerCall();
       navigate(".", { replace: true, state: {} });
     }
@@ -326,25 +333,22 @@ export default function Intro() {
       <audio ref={hangUpRef} src="/audio/hang-up.mp3" />
       <audio ref={voiceRef} src="/audio/teams_call_intro.wav" onEnded={endCall} />
 
-      {/* ✅ SAME TASKBAR AS GAME */}
       <Taskbar showHome homeTo="/" />
     </div>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  // ✅ now matches Game typography/padding
   page: {
     minHeight: "100vh",
     background: "transparent",
     position: "relative",
     padding: 24,
-    paddingBottom: 90, // ✅ space for taskbar
+    paddingBottom: 90,
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
   },
 
-  // Toast
-  toastWrap: { position: "fixed", right: 18, bottom: 80, zIndex: 9999 }, // ⬅️ lifted above taskbar
+  toastWrap: { position: "fixed", right: 18, bottom: 80, zIndex: 9999 },
   toast: {
     width: 330,
     background: "#111827",
@@ -394,7 +398,6 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: "pointer",
   },
 
-  // Call window
   callWindow: {
     position: "fixed",
     background: "#2B2B2B",

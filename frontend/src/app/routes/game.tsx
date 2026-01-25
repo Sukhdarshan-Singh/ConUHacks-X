@@ -286,16 +286,17 @@ Find out what really happened.”`,
 
   function ignoreEmail() {
     setShowEmailNotif(false);
-    openWin("clue");
+    // This ensures the Magnifying Glass appears in the Taskbar immediately
+    openWin("clue"); 
   }
 
   function closeEmailWindow() {
     closeWin("email");
-
     const didOpen = emailInteraction.current.opened;
     const didClick = emailInteraction.current.phishClicked;
 
     if (didOpen && !didClick) {
+      // This ensures the Magnifying Glass appears in the Taskbar
       openWin("clue");
     }
   }
@@ -368,7 +369,7 @@ Find out what really happened.”`,
             <div style={styles.transcriptScroll}>
               {transcriptText}
             </div>
-            <button onClick={closeTranscript}>Mark as Read</button>
+            {/* <button onClick={closeTranscript}>Mark as Read</button> */}
           </div>
         </DesktopWindow>
       )}

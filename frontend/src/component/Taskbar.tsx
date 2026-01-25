@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 type TaskbarProps = {
-    showHome?: boolean; // show home button or not
-    homeTo?: string; // where home button navigates
-    onStartClick?: () => void; // if you want custom start click behavior
+    showHome?: boolean;
+    homeTo?: string;
+    onStartClick?: () => void;
+    middle?: React.ReactNode; // Added to receive window icons
 };
 
-export default function Taskbar({ showHome = true, homeTo = "/", onStartClick }: TaskbarProps) {
+export default function Taskbar({ showHome = true, homeTo = "/", onStartClick, middle }: TaskbarProps) {
     const navigate = useNavigate();
     const [now, setNow] = useState(() => new Date());
 
@@ -38,8 +39,10 @@ export default function Taskbar({ showHome = true, homeTo = "/", onStartClick }:
                 )}
             </div>
 
-            {/* Middle (empty here — Game can still have its own window icons area) */}
-            <div style={styles.taskMid} />
+            {/* Middle: This is where your 🔍 and ✉️ icons will live */}
+            <div style={styles.taskMid}>
+                {middle}
+            </div>
 
             {/* Right */}
             <div style={styles.taskRight}>
@@ -73,10 +76,14 @@ const styles: Record<string, React.CSSProperties> = {
         zIndex: 12000,
         fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     },
-
     taskLeft: { display: "flex", gap: 8, alignItems: "center", width: 120 },
-    taskMid: { display: "flex", gap: 8, alignItems: "center", flex: 1 },
-
+    taskMid: { 
+        display: "flex", 
+        gap: 8, 
+        alignItems: "center", 
+        flex: 1, 
+        justifyContent: "center" // Centers the icons like Windows 11
+    },
     startBtn: {
         width: 42,
         height: 42,
@@ -86,7 +93,6 @@ const styles: Record<string, React.CSSProperties> = {
         cursor: "pointer",
         fontSize: 18,
     },
-
     homeBtn: {
         width: 42,
         height: 42,
@@ -96,7 +102,6 @@ const styles: Record<string, React.CSSProperties> = {
         cursor: "pointer",
         fontSize: 16,
     },
-
     taskRight: {
         display: "flex",
         gap: 12,
@@ -105,19 +110,36 @@ const styles: Record<string, React.CSSProperties> = {
         width: 220,
         color: "rgba(0,0,0,0.85)",
     },
-
     trayIcons: {
         display: "flex",
         gap: 10,
         fontSize: 16,
         opacity: 0.9,
     },
-
     clock: {
         textAlign: "right",
         lineHeight: 1.1,
         paddingRight: 6,
     },
+    // Useful styles for the icons passed into the middle
+    taskIcon: {
+        width: 42,
+        height: 42,
+        borderRadius: 8,
+        border: "none",
+        background: "transparent",
+        display: "grid",
+        placeItems: "center",
+        cursor: "pointer",
+        transition: "background 0.2s",
+    },
+    taskIconActive: {
+        background: "rgba(0,0,0,0.05)",
+        borderBottom: "3px solid #0078d4"
+    },
+    taskIconMin: {
+        opacity: 0.6
+    }
 };
 
 export const taskbarStyles = styles;
