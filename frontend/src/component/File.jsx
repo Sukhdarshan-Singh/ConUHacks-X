@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./File.css";
 
-const File = ({ fileName, content, draggable = true }) => {
+const File = ({ fileName, content,password, draggable = true }) => {
   const [isOpen, setIsOpen] = useState(false);
   
   // Icon Position
@@ -47,6 +47,26 @@ const File = ({ fileName, content, draggable = true }) => {
     setOffset({ x: e.clientX - popupPos.x, y: e.clientY - popupPos.y });
   };
 
+  const handleFileClick = () => {
+  // 1. If there is no password, just open it
+  if (!password) {
+    setIsOpen(true);
+    return;
+  }
+
+  // 2. If there is a password, ask the user for it
+  const userInput = prompt(`Enter password for ${fileName}:`);
+
+  // 3. Check if the password is correct
+  if (userInput === password) {
+    setIsOpen(true);
+  } else if (userInput !== null) { 
+    // If userInput is null, they clicked "Cancel". 
+    // Otherwise, it's the wrong password.
+    alert("Wrong password!");
+  }
+};
+
   return (
     <>
       {/* THE ICON */}
@@ -60,7 +80,7 @@ const File = ({ fileName, content, draggable = true }) => {
         }}
         onMouseDown={startIconDrag}
       >
-        <div className="file-item" onClick={() => setIsOpen(true)}>
+        <div className="file-item" onClick={handleFileClick}>
           <div className="file-icon-placeholder">📄</div>
           <span className="file-name">{fileName}</span>
         </div>

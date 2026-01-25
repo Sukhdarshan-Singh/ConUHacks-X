@@ -36,3 +36,9 @@ button {
   opacity: 0.7;
   margin-bottom: 4px;
 }
+
+.second-file {
+    margin-left: 8vw;
+    position: absolute;
+}
+

@@ -69,6 +69,7 @@ Truth: Fell for phishing email</p>
     },
   ];
 
+
   return (
     <div className="Computer-container" style={{ padding: "20px" }}>
       <Folder
@@ -204,12 +205,31 @@ Truth: Fell for phishing email</p>
 
             </div>
 
-            
-            </>
+             </>
+           
         )}
+        
       />
+        {/* Password Protected File (Locked) */}
+      <div className="second-file">
+        <File 
+        fileName="Final_Information.dox" 
+        password="004ysrm" 
+        content={
+          <div>
+            <h2>Final Report</h2>
+            <p>You found the secret info!</p>
+          </div>
+        } />
+        
+      </div>
+
+      />
+            
 
     </div>
+
+    
   );
 };
 
