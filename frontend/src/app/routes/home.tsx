@@ -1,4 +1,6 @@
-import { useLocation, useNavigate } from "react-router";
+import { useLocation} from "react-router";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Home() {
   const location = useLocation();

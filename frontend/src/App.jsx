@@ -34,6 +34,7 @@ export default function App() {
         <Route path="/intro" element={<Intro />} />
         <Route path="/game" element={<Game />} />
         <Route path="/chat" element={<Chat />} />
+  
       </Route>
 
       {/* fallback */}

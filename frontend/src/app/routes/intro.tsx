@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation} from "react-router";
+import { useNavigate } from "react-router-dom";
+
 
 type CallState = "IDLE" | "RINGING" | "CONNECTING" | "PLAYING";
 
