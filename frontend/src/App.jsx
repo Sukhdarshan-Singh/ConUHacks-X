@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom';
+import Computer from './pages/Computer'; 
 import Home from './pages/Home'; 
 import Intro from './pages/Intro'; 
 import Navbar from './component/Navbar';
@@ -14,6 +15,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element = {<Home />}/>
+        <Route path="/computer" element = {<Computer/>}/>
         <Route path="/intro" element = {<Intro/>}/>
         <Route path="*" element = {<h2>404 Not Found</h2>} />
       </Routes>
