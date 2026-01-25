@@ -6,6 +6,7 @@ import Navbar from './component/Navbar';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import Chat from "./Chat.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element = {<Home />}/>
         <Route path="/intro" element = {<Intro/>}/>
+        <Route path="/chat" element={<Chat />} />
         <Route path="*" element = {<h2>404 Not Found</h2>} />
       </Routes>
       <Navbar />
