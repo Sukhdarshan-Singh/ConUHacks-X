@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
-import Home from "./app/routes/home";
+import Home from "./pages/Home";
 import Intro from "./app/routes/intro";
 import Game from "./app/routes/game";
 import Final from "./pages/Final";
