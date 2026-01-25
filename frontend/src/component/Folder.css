@@ -1,6 +1,7 @@
 /* ===== Folder icon on desktop ===== */
 
 .folder-container {
+  margin-left: 50vw;
   display: inline-block;
   user-select: none;
 }
@@ -21,15 +22,14 @@
 .folder-popup-backdrop {
   position: fixed;
   inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
+
 }
 
 /* ===== Folder window ===== */
 
 .folder-popup {
+  position: absolute;
   background-color: #ffffff;
   padding: 18px 20px 20px;
   min-width: 420px;
@@ -43,6 +43,7 @@
     0 0 30px rgba(0, 0, 0, 0.15);
 
   animation: folderOpen 0.15s ease-out;
+  z-index: 1001;
 }
 
 /* ===== Folder title bar ===== */

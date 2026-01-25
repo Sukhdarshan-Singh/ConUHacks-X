@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Taskbar, { taskbarStyles } from "../../component/Taskbar";
+import Computer from "../../pages/Computer";
 
 import VideoLogo from "../../assets/Video_Logo.png";
 
@@ -321,48 +322,57 @@ Find out what really happened.”`,
       minimized: wins[k].minimized,
     }));
 
+
+
+    // Update your close function to also increment the count
+    function closeTranscript() {
+      closeWin("transcript");
+      incrementCount(); // This ensures it stays gone based on your count logic
+    }
+
+    // 1. Initialize count from localStorage
+  const [count, setCount] = useState(() => {
+    const saved = localStorage.getItem("transcriptRead");
+    return saved ? parseInt(saved) : 0;
+  });
+
+  // 2. Update both state and localStorage when clicking
+  const incrementCount = () => {
+    setCount(1);
+    localStorage.setItem("transcriptRead", "1");
+    navigate("/chat"); // Navigate after saving
+  };
+  
   return (
+    
     <div style={styles.page}>
       <div style={{ color: "white" }}>
         <h1 style={{ marginTop: 0 }}>Desktop</h1>
         <p style={{ opacity: 0.85 }}>You’re “on a computer.” Windows will appear as events happen.</p>
       </div>
-
-      {/* ✅ Desktop icon now routes to /chat */}
-      <div style={styles.desktopIcons}>
-        <button
-        type="button"
-          style={styles.desktopIconBtn}
-          onClick={() => window.location.assign("/chat")}
-          title="Open chat"
+      <Computer/>
+      
+      {/* Use the count logic here if you want to permanently delete it from the DOM */}
+      {count < 1 && wins.transcript.open && (
+        <DesktopWindow
+          winKey="transcript"
+          state={wins.transcript}
+          setState={(up) => setWins((p) => ({ ...p, transcript: up(p.transcript) }))}
+          bringToFront={() => bumpZ("transcript")}
+          onClose={closeTranscript} // Triggers the count + close
         >
-          <div style={styles.desktopIconImgWrap}>
-            <img src={VideoLogo} alt="Chat icon" style={styles.desktopIconImg} />
+          <div 
+            style={{ padding: 14, cursor: 'pointer' }} 
+            onClick={incrementCount} // Now the body of the window is clickable
+          >
+            <div style={styles.transcriptScroll}>
+              {transcriptText}
+            </div>
+            <button onClick={closeTranscript}>Mark as Read</button>
           </div>
-          <div style={styles.desktopIconLabel}>Chat</div>
-        </button>
-      </div>
-
-      <DesktopWindow
-        winKey="transcript"
-        state={wins.transcript}
-        setState={(up) => setWins((p) => ({ ...p, transcript: up(p.transcript) }))}
-        bringToFront={() => bumpZ("transcript")}
-        onClose={() => closeWin("transcript")}
-      >
-        <div style={{ padding: 14, height: "100%", boxSizing: "border-box" }}>
-          <div style={{ fontWeight: 900, marginBottom: 10 }}>Confidential — Internal Use</div>
-
-          <div style={styles.transcriptScroll}>
-            {transcriptText.split("\n").map((line, idx) => (
-              <div key={idx} style={{ marginBottom: 8 }}>
-                {line}
-              </div>
-            ))}
-          </div>
-        </div>
-      </DesktopWindow>
-
+        </DesktopWindow>
+      )}
+        
       <DesktopWindow
         winKey="email"
         state={wins.email}
@@ -478,6 +488,21 @@ Find out what really happened.”`,
           </div>
         </div>
       )}
+
+      {/* ✅ Desktop icon now routes to /chat */}
+      <div style={styles.desktopIcons}>
+        <button
+        type="button"
+          style={styles.desktopIconBtn}
+          onClick={() => window.location.assign("/chat")}
+          title="Open chat"
+        >
+          <div style={styles.desktopIconImgWrap}>
+            <img src={VideoLogo} alt="Chat icon" style={styles.desktopIconImg} />
+          </div>
+          <div style={styles.desktopIconLabel}>Chat</div>
+        </button>
+      </div>
 
       <Taskbar
         showHome

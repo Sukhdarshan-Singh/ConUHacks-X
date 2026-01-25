@@ -5,6 +5,7 @@
 .file-container {
   display: inline-block;
   margin: 12px;
+  margin-left: 25vw;
   position: relative;
 }
 
@@ -39,9 +40,9 @@
 ================================ */
 
 .file-popup-backdrop {
-  position: fixed;
+ position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1000; /* Backdrop is the base layer */
 }
 
 /* ===============================
@@ -50,8 +51,6 @@
 
 .file-popup {
   position: absolute;
-  top: 60px;
-  left: 80px;
 
   width: 760px;
   height: 85vh;
@@ -70,6 +69,8 @@
 
   cursor: move; /* VISUAL draggable cue */
   animation: wordOpen 0.18s ease-out;
+
+  z-index: 1001;
 }
 
 /* ===============================
