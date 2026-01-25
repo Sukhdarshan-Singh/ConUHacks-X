@@ -1,11 +1,9 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Computer from './pages/Computer'; 
-import Home from './pages/Home'; 
-import Intro from './pages/Intro'; 
+//import Home from './pages/Home'; 
+//import Intro from './pages/Intro'; 
 import Navbar from './component/Navbar';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import React from "react";
 
@@ -14,7 +12,7 @@ import Home from "./app/routes/home.tsx";
 import Intro from "./app/routes/intro.tsx";
 import Game from "./app/routes/game.tsx";
 import Index from "./app/routes/index.tsx";
-import Chat from "./Chat"
+import Chat from "./Chat.jsx"
 
 // This replaces routes/_layout.tsx without you needing framework mode.
 // If you already have routes/_layout.jsx and want to use it instead,
@@ -22,18 +20,8 @@ import Chat from "./Chat"
 function Layout() {
   return (
     <>
-      <Routes>
-        <Route path="/" element = {<Home />}/>
-        <Route path="/computer" element = {<Computer/>}/>
-        <Route path="/intro" element = {<Intro/>}/>
-        <Route path = "/game" element = {<Game/>}/>
-        <Route path="*" element = {<h2>404 Not Found</h2>} />
-      </Routes>
-      <Navbar />
-
       <div className="min-h-screen">
-        {/* put shared UI here if you want (header/sidebar/etc) */}
-         <Outlet />
+         <Outlet /> {/* This is where Home, Intro, Game, and Chat will appear */}
       </div>
     </>
   );
@@ -42,21 +30,17 @@ function Layout() {
 export default function App() {
   return (
     <Routes>
-      {/* index route */}
       <Route path="/" element={<Index />} />
-
-      {/* explicit pages */}
       <Route path="/home" element={<Home />} />
+      <Route path="/computer" element={<Computer />} /> {/* Added this back */}
+      <Route path="/chat" element={<Chat />} /> {/* Typo fixed here */}
+      <Route path="/game" element={<Game />} />
+      
 
-      {/* layout wrapper for intro + game */}
       <Route element={<Layout />}>
         <Route path="/intro" element={<Intro />} />
-        <Route path="/game" element={<Game />} />
-        <Route path="/chat" element={<Chat />} />
-  
       </Route>
 
-      {/* fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

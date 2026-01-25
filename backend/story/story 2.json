@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Midnight at Poly",
+    "version": "1.0"
+  },
+  "documents": [
+    {
+      "id": "doc_witness_note",
+      "title": "Witness Note",
+      "type": "note",
+      "content": "I saw someone leaving the lab at 11:42 PM...",
+      "tags": ["witness", "lab"],
+      "unlock": { "type": "action", "actionId": "inspect_lab" }
+    }
+  ],
+  "suspects": [
+    { "id": "sus_alex", "name": "Alex", "bio": "Works late. Nervous.", "alibi": "Claims to be in the library." }
+  ],
+  "scenes": [
+    {
+      "id": "scene_1",
+      "title": "The Discovery",
+      "text": "A body is found. The room is sealed.",
+      "availableActions": ["inspect_lab", "inspect_hallway"]
+    }
+  ],
+  "actions": [
+    {
+      "id": "inspect_lab",
+      "label": "Inspect the lab",
+      "effects": [
+        { "type": "unlock_document", "documentId": "doc_witness_note" },
+        { "type": "set_state", "path": "flags.labInspected", "value": true }
+      ]
+    }
+  ]
+}

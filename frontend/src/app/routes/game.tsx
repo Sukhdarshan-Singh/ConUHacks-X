@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Computer from "../../pages/Computer";
 
 type DragState = {
   dragging: boolean;
@@ -340,7 +341,9 @@ Find out what really happened.”`,
   const dateStr = now.toLocaleDateString([], { month: "2-digit", day: "2-digit", year: "numeric" });
 
   return (
+  
     <div style={styles.page}>
+      <Computer/>
       {/* (Your gameplay content can be here) */}
       <div style={{ color: "white" }}>
         <h1 style={{ marginTop: 0 }}>Desktop</h1>

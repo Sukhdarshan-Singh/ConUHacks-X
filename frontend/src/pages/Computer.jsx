@@ -14,6 +14,8 @@ import Michelle_Hale from "../assets/Michelle_Hale.png";
 import Ming_Tao_Chen from "../assets/Ming_Tao_Chen.png";
 import Video_Logo from "../assets/Video_Logo.png"; 
 import "./Computer.css";
+import {Link} from 'react-router-dom'; 
+
 
 const Computer = () => {
   const myFiles = [
@@ -129,9 +131,15 @@ Truth: Fell for phishing email</p>
       />
 
       {
-        <button type="button" onclick="alert('Button clicked!')">
-            <img src={Video_Logo} alt="Video streaming application logo"/>
-        </button>
+        <Link to="/chat">
+            <button 
+            type="button" 
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+                <img src={Video_Logo} alt="Video streaming application logo"/>
+            </button>
+        </Link>
+
 
       }
 
