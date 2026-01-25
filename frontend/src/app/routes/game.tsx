@@ -331,8 +331,9 @@ Find out what really happened.”`,
       {/* ✅ Desktop icon now routes to /chat */}
       <div style={styles.desktopIcons}>
         <button
+        type="button"
           style={styles.desktopIconBtn}
-          onClick={() => navigate("/chat")}
+          onClick={() => window.location.assign("/chat")}
           title="Open chat"
         >
           <div style={styles.desktopIconImgWrap}>

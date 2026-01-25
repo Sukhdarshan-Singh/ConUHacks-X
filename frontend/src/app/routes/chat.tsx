@@ -25,7 +25,7 @@ export default function ChatRoute() {
         </div>
 
         <button
-          onClick={() => navigate("/game")}
+        onClick={() => window.location.assign("/game")}
           title="Close"
           style={{
             width: 36,
