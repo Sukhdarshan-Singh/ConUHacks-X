@@ -1,14 +1,9 @@
 import os
 import google.generativeai as genai
 
-def get_ai_response(user_prompt: str, system_instruction: str, *, temperature: float = 0.2) -> str:
-    """Generate a response from Gemini using a provided system instruction.
-
-    Notes:
-    - Keep this function character-agnostic. The caller selects the character and passes the system prompt.
-    - GEMINI_API_KEY must be set in environment.
-    """
+def get_kevin_response(user_prompt: str, system_instruction: str) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
+
     if not api_key:
         return "ERROR: TERMINAL DISCONNECTED. API KEY MISSING."
 
@@ -16,14 +11,14 @@ def get_ai_response(user_prompt: str, system_instruction: str, *, temperature: f
         genai.configure(api_key=api_key)
 
         model = genai.GenerativeModel(
-            model_name="models/gemini-2.5-flash",
+            model_name="models/gemini-2.5-flash",  
             system_instruction=system_instruction
         )
 
         response = model.generate_content(
             user_prompt,
             generation_config={
-                "temperature": float(temperature),
+                "temperature": 0.1,
                 "top_p": 0.8,
                 "top_k": 40
             }

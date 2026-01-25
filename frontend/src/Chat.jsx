@@ -155,8 +155,8 @@ const IconSend = () => (
 ========================= */
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-async function postChat(message) {
-  const res = await fetch("/api/chat/kevin", {
+async function postChat(characterId, message) {
+  const res = await fetch(`/api/chat/${characterId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message }),
@@ -179,30 +179,53 @@ const formatTime = (d) => {
   }
 };
 
+const makeInitialMessage = (characterId, characterName) => {
+  // You can customize these intros if you want.
+  const defaults = {
+    michelle: "State your request. Keep it relevant and brief.",
+    elena: "If this is about the numbers, be specific.",
+    thomas: "Hello. Let's keep this professional.",
+    alex: "Uh… hi. I’ll try to help.",
+  };
+
+  return {
+    id: `initial-${characterId}`,
+    sender: characterId,
+    text: defaults[characterId] || `Hello. This is ${characterName}.`,
+    timestamp: new Date(),
+  };
+};
+
 /* =========================
    Chat Component
 ========================= */
 export default function Chat() {
-  const [messages, setMessages] = useState([
-    {
-      id: "initial",
-      sender: "kevin",
-      text: "I'm currently dealing with Susan's BIOS lockdown. This better be quick.",
-      timestamp: new Date(),
-    },
-  ]);
+  // Characters (frontend contact list)
+  const contacts = [
+    { id: "michelle", name: "Michelle Hale", role: "Head of IT Security", status: "Busy" },
+    { id: "elena", name: "Elena Weiss", role: "Finance Manager", status: "Available" },
+    { id: "thomas", name: "Thomas Reed", role: "External Auditor", status: "Away" },
+    { id: "alex", name: "Alex Kim", role: "Junior Analyst", status: "Online" },
+  ];
+
+  const [activeId, setActiveId] = useState("michelle");
+  const active = contacts.find((c) => c.id === activeId) || contacts[0];
+
+  // Separate chat history per character
+  const [convos, setConvos] = useState(() => {
+    const init = {};
+    for (const c of contacts) {
+      init[c.id] = [makeInitialMessage(c.id, c.name)];
+    }
+    return init;
+  });
+
+  const messages = convos[activeId] || [];
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
-
-  const contacts = [
-    { name: "Kevin", role: "IT Manager", status: "Busy" },
-    { name: "Susan", role: "CEO", status: "Away" },
-    { name: "Bill", role: "Sales", status: "Available" },
-    { name: "Janet", role: "Accounting", status: "Do not disturb" },
-  ];
 
   // ----- Draggable window state -----
   const [state, setState] = useState({
@@ -223,31 +246,41 @@ export default function Chat() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, activeId]);
 
   const send = async () => {
     const text = inputValue.trim();
     if (!text || isTyping) return;
 
-    setMessages((prev) => [
+    // Add user message to current convo
+    setConvos((prev) => ({
       ...prev,
-      { id: Date.now().toString(), sender: "user", text, timestamp: new Date() },
-    ]);
+      [activeId]: [
+        ...(prev[activeId] || []),
+        { id: Date.now().toString(), sender: "user", text, timestamp: new Date() },
+      ],
+    }));
+
     setInputValue("");
     setIsTyping(true);
 
-    const reply = await postChat(text);
+    const reply = await postChat(activeId, text);
 
     setIsTyping(false);
-    setMessages((prev) => [
+
+    // Add character reply
+    setConvos((prev) => ({
       ...prev,
-      {
-        id: (Date.now() + 1).toString(),
-        sender: "kevin",
-        text: reply,
-        timestamp: new Date(),
-      },
-    ]);
+      [activeId]: [
+        ...(prev[activeId] || []),
+        {
+          id: (Date.now() + 1).toString(),
+          sender: activeId,
+          text: reply,
+          timestamp: new Date(),
+        },
+      ],
+    }));
 
     inputRef.current?.focus();
   };
@@ -285,7 +318,7 @@ export default function Chat() {
     };
   }, [state.maximized, state.minimized]);
 
-  // This starts dragging (attached to header)
+  // Start dragging (header)
   const onDragMouseDown = (e) => {
     if (state.maximized || state.minimized) return;
 
@@ -301,14 +334,19 @@ export default function Chat() {
     send();
   };
 
+  const resetActiveChat = () => {
+    setConvos((prev) => ({
+      ...prev,
+      [activeId]: [makeInitialMessage(activeId, active.name)],
+    }));
+  };
+
   // Sidebar “icon background” styles
   const sideBtn = "p-2 rounded-xl bg-white/15 text-white flex items-center justify-center";
   const sideBtnActive = "p-2 rounded-xl bg-white/30 text-white flex items-center justify-center";
 
   return (
-    // Background layer
     <div className="fixed inset-0 bg-[#f3f2f1] overflow-hidden">
-      {/* Draggable layer */}
       <div
         className="absolute inset-0 flex overflow-hidden"
         style={{
@@ -343,25 +381,43 @@ export default function Chat() {
         <div className="w-80 bg-[#edebe9] border-r border-black/10 flex flex-col">
           <div className="p-4 flex items-center justify-between">
             <div className="font-bold text-xl text-[#242424]">Chat</div>
-            <button className="p-2 rounded bg-black/5 text-black/90" title="New chat" type="button">
+            <button
+              className="p-2 rounded bg-black/5 text-black/90"
+              title="New chat (reset current)"
+              type="button"
+              onClick={resetActiveChat}
+            >
               <IconNewChat />
             </button>
           </div>
 
           <div className="px-4 pb-3">
-            <input className="w-full p-2 rounded border border-black/10 bg-white" placeholder="Search" />
+            <input className="w-full p-2 rounded border border-black/10 bg-white" placeholder="Search (UI only)" />
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {contacts.map((c) => (
-              <div key={c.name} className="px-4 py-3 hover:bg-[#e1dfdd] cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold text-[#242424]">{c.name}</div>
-                  <div className="text-xs text-black/50">{c.status}</div>
+            {contacts.map((c) => {
+              const selected = c.id === activeId;
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => {
+                    setActiveId(c.id);
+                    setIsTyping(false);
+                    inputRef.current?.focus();
+                  }}
+                  className={`px-4 py-3 cursor-pointer ${
+                    selected ? "bg-[#e1dfdd]" : "hover:bg-[#e1dfdd]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold text-[#242424]">{c.name}</div>
+                    <div className="text-xs text-black/50">{c.status}</div>
+                  </div>
+                  <div className="text-sm text-black/60">{c.role}</div>
                 </div>
-                <div className="text-sm text-black/60">{c.role}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -375,15 +431,13 @@ export default function Chat() {
             title="Drag to move"
           >
             <div>
-              <div className="font-semibold text-[#242424]">Kevin (IT)</div>
+              <div className="font-semibold text-[#242424]">
+                {active.name} ({active.role})
+              </div>
               <div className="text-xs text-black/50">Terminal-style support</div>
             </div>
 
-            {/* Prevent drag when clicking buttons */}
-            <div
-              className="flex items-center gap-3 text-black/70"
-              onMouseDown={(e) => e.stopPropagation()}
-            >
+            <div className="flex items-center gap-3 text-black/70" onMouseDown={(e) => e.stopPropagation()}>
               <button className="p-2 rounded bg-black/5 text-black/90" title="Video" type="button">
                 <IconVideo />
               </button>
@@ -419,7 +473,7 @@ export default function Chat() {
             {isTyping && (
               <div className="mb-4 text-left">
                 <div className="inline-block px-4 py-3 rounded-2xl bg-white border border-black/5 shadow-sm text-sm text-black/50 italic">
-                  Kevin is typing…
+                  {active.name} is typing…
                 </div>
               </div>
             )}
@@ -445,7 +499,7 @@ export default function Chat() {
                 ref={inputRef}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type a message"
+                placeholder={`Message ${active.name}`}
                 className="flex-1 p-3 rounded-xl border border-black/10 bg-[#faf9f8] focus:outline-none"
               />
 
