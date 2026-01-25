@@ -1,6 +1,5 @@
-import { useLocation} from "react-router";
-import { useNavigate } from "react-router-dom";
-
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Home() {
   const location = useLocation();
@@ -11,24 +10,32 @@ export default function Home() {
     (location.state as any)?.message ??
     "This is a game — but in real life you should NOT click unknown links.";
 
-  function restart() {
-    // clear route state + stay on home
-    navigate("/home", { replace: true, state: {} });
-  }
-
   function start() {
     navigate("/intro", { state: { startCall: true } });
   }
 
+  function restart() {
+    navigate("/", { replace: true, state: {} });
+  }
+
   return (
     <div style={styles.page}>
-      <div style={styles.card}>
-        <h1 style={{ marginTop: 0 }}>The Audit That Killed</h1>
-        <p style={{ opacity: 0.85 }}>Press Start to begin.</p>
 
-        <button style={styles.primaryBtn} onClick={start}>
-          Start
-        </button>
+      <div style={styles.stage}>
+        <img
+          src="/images/home.png"
+          alt="Home"
+          style={styles.img}
+          draggable={false}
+        />
+
+        
+        <button
+          type="button"
+          onClick={start}
+          style={styles.startHotspot}
+          aria-label="Start game"
+        />
       </div>
 
       {fail && (
@@ -37,7 +44,8 @@ export default function Home() {
             <div style={{ fontWeight: 900, fontSize: 16, marginBottom: 8 }}>
               ⚠️ You clicked a suspicious link
             </div>
-            <div style={{ fontSize: 13, lineHeight: 1.5 }}>
+
+            <div style={{ fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
               {message}
               <br />
               <br />
@@ -59,43 +67,71 @@ export default function Home() {
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
+    background: "#000",
     display: "grid",
     placeItems: "center",
-    padding: 24,
-    background: "#0B1220",
-    color: "white",
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+    position: "relative",
   },
-  card: {
-    width: 520,
-    borderRadius: 16,
-    padding: 18,
-    background: "rgba(255,255,255,0.06)",
-    border: "1px solid rgba(255,255,255,0.12)",
+
+
+  stage: {
+    position: "relative",
+    width: "min(100vw, calc(100vh * 16 / 9))", // keeps a nice fit if your image is ~16:9
+    height: "min(100vh, calc(100vw * 9 / 16))",
+    maxWidth: "100vw",
+    maxHeight: "100vh",
   },
-  primaryBtn: {
-    marginTop: 12,
-    padding: "12px 16px",
-    borderRadius: 12,
+
+  img: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain", 
+    userSelect: "none",
+    pointerEvents: "none", 
+    display: "block",
+  },
+
+  
+  startHotspot: {
+    position: "absolute",
+    left: "38%",  // <-- adjust
+    top: "74%",   // <-- adjust
+    width: "24%", // <-- make bigger to be less precise
+    height: "10%",// <-- make bigger to be less precise
+
+    background: "transparent",
     border: "none",
-    fontWeight: 900,
     cursor: "pointer",
+
+    WebkitTapHighlightColor: "transparent",
+    touchAction: "manipulation",
+
+    // DEBUG (optional): uncomment to see clickable zone
+    // outline: "2px dashed red",
+    // background: "rgba(255,0,0,0.15)",
   },
+
   overlay: {
     position: "fixed",
     inset: 0,
     background: "rgba(0,0,0,0.55)",
     display: "grid",
     placeItems: "center",
+    zIndex: 9999,
   },
+
   modal: {
     width: 520,
+    maxWidth: "92vw",
     background: "#111827",
     borderRadius: 14,
     padding: 16,
     border: "1px solid rgba(255,255,255,0.12)",
     boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+    color: "white",
+    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
   },
+
   secondaryBtn: {
     padding: "10px 12px",
     borderRadius: 10,
@@ -106,4 +142,3 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
   },
 };
-
