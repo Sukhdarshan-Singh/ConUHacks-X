@@ -2,6 +2,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+// frontend/src/app/routes/home.tsx
 export default function Home() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -12,17 +13,11 @@ export default function Home() {
     "This is a game — but in real life you should NOT click unknown links.";
 
   function start() {
-    // ✅ Fresh run: ensure transcript appears again
     localStorage.setItem("transcriptRead", "0");
     navigate("/intro", { state: { startCall: true } });
   }
 
-  function visitFinal() {
-    navigate("/final");
-  }
-
   function restart() {
-    // ✅ Restart should reset the transcript too
     localStorage.setItem("transcriptRead", "0");
     navigate("/", { replace: true, state: {} });
   }
@@ -31,12 +26,8 @@ export default function Home() {
     <div style={styles.page}>
       <div style={styles.stage}>
         <img src="/images/home.png" alt="Home" style={styles.img} draggable={false} />
-
+        {/* Only the Start Hotspot remains here */}
         <button type="button" onClick={start} style={styles.startHotspot} aria-label="Start game" />
-
-        <button type="button" onClick={visitFinal} style={styles.visitFinalBtn} aria-label="Visit Final">
-          Visit Final
-        </button>
       </div>
 
       {fail && (
@@ -45,14 +36,11 @@ export default function Home() {
             <div style={{ fontWeight: 900, fontSize: 16, marginBottom: 8 }}>
               ⚠️ You clicked a suspicious link
             </div>
-
             <div style={{ fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
               {message}
-              <br />
-              <br />
+              <br /><br />
               <b>You have to restart the game.</b>
             </div>
-
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}>
               <button style={styles.secondaryBtn} onClick={restart}>
                 OK (Restart)

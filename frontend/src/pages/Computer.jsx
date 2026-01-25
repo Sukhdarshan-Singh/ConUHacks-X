@@ -15,59 +15,78 @@ import Ming_Tao_Chen from "../assets/Ming_Tao_Chen.png";
 import "./Computer.css";
 
 const Computer = () => {
-  const myFiles = [
-    {
-        name: "Michelle_Hale.dox",
-        content: (
-            <>
-                <h2>Michelle Hale</h2>
-                <p>Position: Head of IT Security</p>
-                <p>Department: IT</p>
-                <p>Personality: Controlled, defensive, rationalizing
-Truth: Deleted logs, enabled access, triggered HVAC override</p>
-            </>
-        ),
-    
-    },
-    {
-        name: "Elena_Weiss.dox",
-        content: (
-            <>
-                <h2>Elena Weiss</h2>
-                <p>Position: Senior Finance Manager/PSA Power User</p>
-                <p>Department: Finance</p>
-                <p>Personality: Sharp, resentful, defensive
-Truth: Committed fraud, didn’t kill anyone</p>
-            </>
-        ),
-    },
-    {
-        name: "Thomas_Reed.dox",
-        content: (
-            <>
-                <h2>Thomas Reed</h2>
-                <p>Position: Audit Partner</p>
-                <p>Department: ...</p>
-                <p>Personality: Nervous, honest, guilt-ridden
-Truth: Fell for phishing email</p>
-            </>
-        ),
-
-    },
-    {
-        name: "Alex_Kim.dox",
-        content: (
-            <>
-                <h2>Alex Kim</h2>
-                <p>Position: Junior Financial Analyst</p>
-                <p>Department: Tech</p>
-                <p>Personality; Nervous, honest, guilt-ridden</p>
-                <p>Fell for phishing email.</p>
-            </>
-        ),
-
-    },
-  ];
+ const myFiles = [
+  {
+    name: "Michelle_Hale_Dossier.pdf",
+    content: (
+      <div style={{ fontFamily: "Calibri, sans-serif", fontSize: "14px" }}>
+        <div style={{ borderBottom: "2px solid #2b579a", marginBottom: "15px", display: "flex", justifyContent: "space-between" }}>
+          <h2 style={{ color: "#2b579a", margin: 0 }}>INTERNAL PERSONNEL FILE</h2>
+          <span style={{ fontWeight: "bold", color: "red" }}>LEVEL 4 CLEARANCE REQUIRED</span>
+        </div>
+        <p><strong>Employee:</strong> Hale, Michelle | <strong>ID:</strong> 002</p>
+        <p><strong>Position:</strong> Head of Information Security</p>
+        <p><strong>Status:</strong> Under Internal Review</p>
+        <hr />
+        <h3>Professional Profile</h3>
+        <p>Ms. Hale manages all security protocols for the central banking core. Colleagues describe her as highly controlled and hyper-rational. Recent performance reviews indicate a defensive attitude regarding system vulnerabilities.</p>
+        <h3>Security Incident Notes</h3>
+        <p style={{ fontStyle: "italic", color: "#444" }}>"Subject observed accessing server rack 4B outside of scheduled maintenance hours. Manual HVAC overrides were detected shortly after. Digital logs for the session were manually purged from the primary node."</p>
+      </div>
+    ),
+  },
+  {
+    name: "Elena_Weiss_Audit.pdf",
+    content: (
+      <div style={{ fontFamily: "Calibri, sans-serif", fontSize: "14px" }}>
+        <div style={{ borderBottom: "2px solid #2b579a", marginBottom: "15px" }}>
+          <h2 style={{ color: "#2b579a", margin: 0 }}>FINANCE DEPARTMENT LOG</h2>
+        </div>
+        <p><strong>Employee:</strong> Weiss, Elena | <strong>ID:</strong> 003</p>
+        <p><strong>Position:</strong> Senior Finance Manager / PSA Power User</p>
+        <hr />
+        <h3>Observation Summary</h3>
+        <p>Highly competent but vocal regarding her resentment of the current bonus structure. Possesses "Emergency Admin" tokens for the SAP GRC module.</p>
+        <h3>Discrepancy Report</h3>
+        <p>Multiple unauthorized batch payments were routed through "Project X-12" under Weiss’s credentials. While the transactions suggest high-level embezzlement and fraud, there is no evidence linking her to the physical security breach or the subsequent server room incident.</p>
+      </div>
+    ),
+  },
+  {
+    name: "Thomas_Reed_Statement.pdf",
+    content: (
+      <div style={{ fontFamily: "Calibri, sans-serif", fontSize: "14px" }}>
+        <div style={{ borderBottom: "2px solid #2b579a", marginBottom: "15px" }}>
+          <h2 style={{ color: "#2b579a", margin: 0 }}>EXTERNAL AUDIT TESTIMONY</h2>
+        </div>
+        <p><strong>Subject:</strong> Reed, Thomas | <strong>ID:</strong> 004</p>
+        <p><strong>Position:</strong> External Audit Partner</p>
+        <hr />
+        <h3>Case Interview</h3>
+        <p>Subject appeared visibly distressed during the deposition. Reed admitted to bypassing standard verification protocols on the night of the 12th.</p>
+        <h3>Analysis</h3>
+        <p>Evidence confirms Reed fell victim to a sophisticated spear-phishing campaign. He provided his VPN credentials to an external portal disguised as a "Urgent IT Security Update." His involvement appears negligent rather than malicious; however, the guilt-ridden nature of his testimony suggests he is hiding further contacts with Hale.</p>
+      </div>
+    ),
+  },
+  {
+    name: "Alex_Kim_Onboarding.pdf",
+    content: (
+      <div style={{ fontFamily: "Calibri, sans-serif", fontSize: "14px" }}>
+        <div style={{ borderBottom: "2px solid #2b579a", marginBottom: "15px" }}>
+          <h2 style={{ color: "#2b579a", margin: 0 }}>HR PROFILE: JUNIOR ANALYST</h2>
+        </div>
+        <p><strong>Employee:</strong> Kim, Alex | <strong>ID:</strong> 008</p>
+        <p><strong>Department:</strong> Financial Operations</p>
+        <hr />
+        <h3>Performance Review</h3>
+        <p>A recent hire from the summer internship program. Kim is characterized by high honesty scores but low technical skepticism. </p>
+        <h3>Incident Flag</h3>
+        <p>Credentials were used to authorize a wire transfer at 02:00 AM. Forensic analysis suggests Kim’s private key was cloned. Subject claims to have reported a "sluggish system" to Michelle Hale days prior, but no ticket was found in the system.</p>
+      </div>
+    ),
+  },
+];
 
 
   return (
@@ -90,7 +109,7 @@ Truth: Fell for phishing email</p>
                 <p className="log-meta">02:14 AM — 2025-10-12</p>
                 <p>
                     <strong>[ID: 001] Ming Tao Chen (CFO)</strong><br />
-                    Log: System access flagged 3 failed login attempts from external IP. Investigated SAP GRC module. Paranoid about credential leak. Sent urgent meeting request to Audit Partner.
+                    Log: SAP fraud verified. CFO private key used for unauthorized wire transfer at 02:00 AM. Called Michelle Hale — no response.
                 </p>
                 </div>
             </div>
@@ -173,8 +192,8 @@ Truth: Fell for phishing email</p>
                 <div>
                 <p className="log-meta">04:51 AM — 2025-10-12</p>
                 <p>
-                    <strong>[ID: 008] Alex Kim (CFO)</strong><br />
-                    Log: SAP fraud verified. CFO private key used for unauthorized wire transfer at 02:00 AM. Called Michelle Hale — no response.
+                    <strong>[ID: 008] Alex Kim (Analyst)</strong><br />
+                    Log: System access flagged 3 failed login attempts from external IP. Investigated SAP GRC module. Paranoid about credential leak. Sent urgent meeting request to Audit Partner.
                 </p>
                 </div>
             </div>
@@ -213,13 +232,55 @@ Truth: Fell for phishing email</p>
         {/* Password Protected File (Locked) */}
       <div className="second-file">
         <File 
-        fileName="Final_Information.dox" 
+        fileName="financial_info.docx" 
         password="004ysrm" 
         content={
-          <div>
-            <h2>Final Report</h2>
-            <p>You found the secret info!</p>
-          </div>
+            <div style={{ fontFamily: "serif", padding: "20px" }}>
+                <h2>FINAL REPORT</h2>
+                <hr />
+
+                <p style={{ color: "darkred", fontWeight: "bold" }}>
+                ⚠️ FICTIONAL DOCUMENT — FOR INTERNAL SIMULATION USE ONLY
+                </p>
+
+                <h3>Desjardins Group</h3>
+                <p><strong>Document Type:</strong> Simulated Transaction Record</p>
+                <p><strong>Generated:</strong> 2026-01-24 02:17 AM</p>
+
+                <hr />
+
+                <p><strong>Employee ID:</strong> 002</p>
+                <p><strong>Authorization Level:</strong> Internal Finance Clearance</p>
+
+                <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "15px" }}>
+                <thead>
+                    <tr>
+                    <th style={{ borderBottom: "1px solid #000", textAlign: "left" }}>Transaction Type</th>
+                    <th style={{ borderBottom: "1px solid #000", textAlign: "left" }}>Amount</th>
+                    <th style={{ borderBottom: "1px solid #000", textAlign: "left" }}>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td>Wire Withdrawal</td>
+                    <td>$1,527,001.00 CAD</td>
+                    <td>Completed</td>
+                    </tr>
+                </tbody>
+                </table>
+
+                <p style={{ marginTop: "15px" }}>
+                <strong>Notes:</strong><br />
+                Transaction executed during off-hours. Authorization logs indicate use of elevated credentials.
+                Audit trail partially redacted.
+                </p>
+
+                <hr />
+
+                <p style={{ fontSize: "12px", opacity: 0.7 }}>
+                This document is part of a fictional narrative and does not represent real banking data.
+                </p>
+            </div>
         } />
         
       </div>

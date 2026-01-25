@@ -236,6 +236,10 @@ Find out what really happened.”`,
     return () => clearTimeout(timer);
   }, []);
 
+  function visitFinal() {
+    navigate("/final");
+  }
+
   function bumpZ(key: WindowKey) {
     setZTop((z) => {
       const next = z + 1;
@@ -314,6 +318,7 @@ Find out what really happened.”`,
     });
   }
 
+
   const openIcons = (Object.keys(wins) as WindowKey[])
     .filter((k) => wins[k].open)
     .map((k) => ({
@@ -322,6 +327,7 @@ Find out what really happened.”`,
       title: WIN_CONFIG[k].title,
       minimized: wins[k].minimized,
     }));
+
 
 
 
@@ -352,6 +358,10 @@ Find out what really happened.”`,
         <p style={{ opacity: 0.85 }}>You’re “on a computer.” Windows will appear as events happen.</p>
       </div>
       <Computer/>
+
+      <button type="button" onClick={visitFinal} style={styles.visitFinalBtn} aria-label="Visit Final">
+        FOUND THE KILLER?
+      </button>
       
       {/* Use the count logic here if you want to permanently delete it from the DOM */}
       {count < 1 && wins.transcript.open && (
@@ -531,13 +541,31 @@ Find out what really happened.”`,
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  
   page: {
     minHeight: "100vh",
     padding: 24,
     background: "transparent",
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
     position: "relative",
-    paddingBottom: 90,
+    paddingBottom: 90, // Keeps content above taskbar
+  },
+
+  visitFinalBtn: {
+    position: "fixed",
+    bottom: "80px", // Placed above the taskbar (which is usually ~56px-60px)
+    right: "26px",
+    padding: "12px 24px",
+    background: "#c41e3a",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+    zIndex: 4000, // Higher than desktop icons but lower than windows
   },
 
   desktopIcons: {
@@ -719,4 +747,5 @@ const styles: Record<string, React.CSSProperties> = {
   },
   signature: { marginTop: 14, whiteSpace: "pre-line" },
   autoNote: { marginTop: 12, fontSize: 12, opacity: 0.7 },
+
 };
