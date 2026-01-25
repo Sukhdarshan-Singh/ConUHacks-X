@@ -121,5 +121,3 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export const taskbarStyles = styles;
-
-export const taskbarStyles = styles;
