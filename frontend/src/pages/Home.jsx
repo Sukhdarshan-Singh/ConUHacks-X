@@ -7,7 +7,7 @@ const Home = () => {
     const navigate = useNavigate();
 
     const handleStartGame = () => {
-        navigate("/intro");
+        navigate("/intro", { state: { startCall: true } });
     };
 
     return (

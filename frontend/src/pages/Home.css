@@ -84,15 +84,8 @@
         padding: 20px;
     }
 
-    .title-main,
-    .title-highlight,
-    .title-red {
-        font-size: 42px;
-    }
-
     .home-logo {
-        width: 80px;
-        height: 80px;
+        max-width: 80%;
     }
 
     .start-button {
@@ -103,15 +96,13 @@
 }
 
 @media (max-width: 480px) {
-    .title-main,
-    .title-highlight,
-    .title-red {
-        font-size: 28px;
+    .home-content {
+        gap: 30px;
+        padding: 15px;
     }
 
     .home-logo {
-        width: 60px;
-        height: 60px;
+        max-width: 70%;
     }
 
     .start-button {
