@@ -6,10 +6,10 @@ const Final = () => {
     const [selectedIndex, setSelectedIndex] = useState(null);
 
     const suspects = [
-        { id: 1, name: "Head of IT", image: "/character/Personnage1.png" },
-        { id: 2, name: "Head of IT", image: "/character/Personnage2.png" },
-        { id: 3, name: "Head of IT", image: "/character/Personnage3.png" },
-        { id: 4, name: "Head of IT", image: "/character/Personnage4.png" },
+        { id: 1, name: "Michelle Hale", image: "/character/Personnage1.png" },
+        { id: 2, name: "Elena Weiss", image: "/character/Personnage2.png" },
+        { id: 3, name: "Alex Kim", image: "/character/Personnage3.png" },
+        { id: 4, name: "Thomas Reed", image: "/character/Personnage4.png" },
     ];
 
     const handleSelect = () => {

@@ -84,11 +84,11 @@ Truth: Fell for phishing email</p>
             <div className="Log-container">
 
             <div className="log-row">
-                <img src={David_Kline} className="log-avatar" />
+                <img src={Ming_Tao_Chen} className="log-avatar" />
                 <div>
                 <p className="log-meta">02:14 AM — 2025-10-12</p>
                 <p>
-                    <strong>[ID: 001] David Kline (CFO)</strong><br />
+                    <strong>[ID: 001] Ming Tao Chen (CFO)</strong><br />
                     Log: System access flagged 3 failed login attempts from external IP. Investigated SAP GRC module. Paranoid about credential leak. Sent urgent meeting request to Audit Partner.
                 </p>
                 </div>
@@ -120,11 +120,11 @@ Truth: Fell for phishing email</p>
             <hr />
 
             <div className="log-row">
-                <img src={Ming_Tao_Chen} className="log-avatar" />
+                <img src={David_Kline} className="log-avatar" />
                 <div>
                 <p className="log-meta">03:21 AM — 2025-10-12</p>
                 <p>
-                    <strong>[ID: 004] Ming Tao Chen (External Auditor)</strong><br />
+                    <strong>[ID: 004] Thomas Reed (External Auditor)</strong><br />
                     Log: Finalized audit draft. Significant variance found in offshore accounts. Variance dismissed after private dinner with Head of IT Security. Signed off on compliance.
                 </p>
                 </div>
