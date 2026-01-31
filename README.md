@@ -1,9 +1,7 @@
-# ConUHacks-X
-
-# Before the Click
+# The Audit That Killed
 An Interactive Murder Mystery game. 
 
-## Members and Role
+## Members
 - Yemisi Kelsea 
 - Sukhdarshan Singh 
 - Rime Mokhtari 
